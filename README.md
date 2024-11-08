@@ -5,6 +5,7 @@
 1. Go 1.22
 2. Docker
 3. [golang-migrate](https://github.com/golang-migrate/migrate)
+4. [sqlc](https://github.com/sqlc-dev/sqlc)
 
 Database can be set up via Makefile
 
