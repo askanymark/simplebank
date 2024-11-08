@@ -14,6 +14,4 @@ Database can be set up via Makefile
 ```shell
 # Create a new SQL migration under db/migration directory 
 migrate create -ext sql -dir db/migration -seq <filename>
-# Run migrations UP
-migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
 ```
