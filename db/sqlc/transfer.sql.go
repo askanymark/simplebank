@@ -57,17 +57,26 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 const listTransfers = `-- name: ListTransfers :many
 SELECT id, from_account_id, to_account_id, amount, created_at
 FROM transfers
+WHERE from_account_id = $1
+   OR to_account_id = $2
 ORDER BY id
-LIMIT $1 OFFSET $2
+LIMIT $3 OFFSET $4
 `
 
 type ListTransfersParams struct {
-	Limit  int64 `json:"limit"`
-	Offset int64 `json:"offset"`
+	FromAccountID int64 `json:"from_account_id"`
+	ToAccountID   int64 `json:"to_account_id"`
+	Limit         int64 `json:"limit"`
+	Offset        int64 `json:"offset"`
 }
 
 func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error) {
-	rows, err := q.db.Query(ctx, listTransfers, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listTransfers,
+		arg.FromAccountID,
+		arg.ToAccountID,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}

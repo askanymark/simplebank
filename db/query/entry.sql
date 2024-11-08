@@ -12,5 +12,6 @@ LIMIT 1;
 -- name: ListEntries :many
 SELECT *
 FROM entries
+WHERE account_id = $1
 ORDER BY id
-LIMIT $1 OFFSET $2;
+LIMIT $2 OFFSET $3;
