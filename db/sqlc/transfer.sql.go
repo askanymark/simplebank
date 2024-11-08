@@ -34,17 +34,6 @@ func (q *Queries) CreateTransfer(ctx context.Context, arg CreateTransferParams) 
 	return i, err
 }
 
-const deleteTransfer = `-- name: DeleteTransfer :exec
-DELETE
-FROM transfers
-WHERE id = $1
-`
-
-func (q *Queries) DeleteTransfer(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteTransfer, id)
-	return err
-}
-
 const getTransfer = `-- name: GetTransfer :one
 SELECT id, from_account_id, to_account_id, amount, created_at
 FROM transfers
@@ -101,29 +90,4 @@ func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateTransfer = `-- name: UpdateTransfer :one
-UPDATE transfers
-SET amount = $2
-WHERE id = $1
-RETURNING id, from_account_id, to_account_id, amount, created_at
-`
-
-type UpdateTransferParams struct {
-	ID     int64 `json:"id"`
-	Amount int64 `json:"amount"`
-}
-
-func (q *Queries) UpdateTransfer(ctx context.Context, arg UpdateTransferParams) (Transfer, error) {
-	row := q.db.QueryRow(ctx, updateTransfer, arg.ID, arg.Amount)
-	var i Transfer
-	err := row.Scan(
-		&i.ID,
-		&i.FromAccountID,
-		&i.ToAccountID,
-		&i.Amount,
-		&i.CreatedAt,
-	)
-	return i, err
 }
