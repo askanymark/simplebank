@@ -60,7 +60,7 @@ func TestTransferTx(t *testing.T) {
 		require.NotZero(t, fromEntry.CreatedAt)
 
 		_, err = store.GetEntry(context.Background(), fromEntry.ID)
-		require.NoError(t, err) // TODO sql no results error for some reason. DB record exists
+		require.NoError(t, err)
 
 		// check destination entry
 		toEntry := result.ToEntry
