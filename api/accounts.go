@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	db "simplebank/db/sqlc"
@@ -51,7 +52,7 @@ func (server *Server) getAccount(context *gin.Context) {
 	account, err := server.store.GetAccount(context, req.ID)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			context.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -61,4 +62,30 @@ func (server *Server) getAccount(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, account)
+}
+
+type listAccountsRequest struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+func (server *Server) listAccounts(context *gin.Context) {
+	var req listAccountsRequest
+
+	if err := context.ShouldBindQuery(&req); err != nil {
+		context.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	accounts, err := server.store.ListAccounts(context, db.ListAccountsParams{
+		Limit:  int64(req.PageSize),
+		Offset: int64((req.PageID - 1) * req.PageSize),
+	})
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	context.JSON(http.StatusOK, accounts)
 }
