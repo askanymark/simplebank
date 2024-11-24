@@ -200,8 +200,85 @@ func TestCreateAccount(t *testing.T) {
 			recorder := httptest.NewRecorder()
 			url := "/accounts"
 
-			request, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(body)))
+			request, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 			request.Header.Set("Content-Type", "application/json")
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
+func TestListAccounts(t *testing.T) {
+	var query string
+
+	testCases := []struct {
+		name          string
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			"OK",
+			func(store *mockdb.MockStore) {
+				query = "?page_id=1&page_size=5"
+
+				store.EXPECT().ListAccounts(gomock.Any(), gomock.Eq(db.ListAccountsParams{
+					Limit:  5,
+					Offset: 0,
+				})).Times(1).Return([]db.Account{}, nil)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			"InvalidQuery",
+			func(store *mockdb.MockStore) {
+				query = "?this_will_fail"
+
+				store.EXPECT().
+					ListAccounts(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			"InternalError",
+			func(store *mockdb.MockStore) {
+				query = "?page_id=1&page_size=5"
+
+				store.EXPECT().
+					ListAccounts(gomock.Any(), gomock.Eq(db.ListAccountsParams{
+						Limit:  5,
+						Offset: 0,
+					})).
+					Times(1).
+					Return([]db.Account{}, sql.ErrConnDone)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			controller := gomock.NewController(t)
+			defer controller.Finish()
+
+			store := mockdb.NewMockStore(controller)
+			tc.buildStubs(store)
+
+			// start the server and send request
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+
+			request, err := http.NewRequest("GET", fmt.Sprintf("/accounts%s", query), nil)
 			require.NoError(t, err)
 
 			server.router.ServeHTTP(recorder, request)
