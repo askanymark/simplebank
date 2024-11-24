@@ -413,6 +413,106 @@ func TestUpdateAccounts(t *testing.T) {
 	}
 }
 
+func TestDeleteAccount(t *testing.T) {
+	var account db.Account
+	var accountId string
+
+	testCases := []struct {
+		name          string
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			"NoContent",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(account, nil)
+				store.EXPECT().DeleteAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNoContent, recorder.Code)
+			},
+		},
+		{
+			"InvalidId",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = "this will fail"
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).Times(0)
+				store.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			"NotFound",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
+				store.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			"InternalError during select",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, sql.ErrConnDone)
+				store.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			"InternalError during delete",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(account, nil)
+				store.EXPECT().DeleteAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(sql.ErrConnDone)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			controller := gomock.NewController(t)
+			defer controller.Finish()
+
+			store := mockdb.NewMockStore(controller)
+
+			tc.buildStubs(store)
+
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+			url := fmt.Sprintf("/accounts/%s", accountId)
+			request, err := http.NewRequest("DELETE", url, nil)
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
 func randomAccount() db.Account {
 	return db.Account{
 		ID:        util.RandomInt(1, 1000),
