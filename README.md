@@ -6,6 +6,7 @@
 2. Docker
 3. [golang-migrate](https://github.com/golang-migrate/migrate)
 4. [sqlc](https://github.com/sqlc-dev/sqlc)
+5. [mockgen](https://github.com/uber-go/mock)
 
 Database can be set up via Makefile
 
