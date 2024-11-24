@@ -13,6 +13,7 @@ import (
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/util"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -279,6 +280,131 @@ func TestListAccounts(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			request, err := http.NewRequest("GET", fmt.Sprintf("/accounts%s", query), nil)
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
+func TestUpdateAccounts(t *testing.T) {
+	var account db.Account
+	var body []byte
+	var accountId string
+
+	testCases := []struct {
+		name          string
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			"NoContent",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+				body = []byte(fmt.Sprintf(`{"balance":%d}`, int64(10)))
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(account, nil)
+
+				store.EXPECT().UpdateAccount(gomock.Any(), gomock.Eq(db.UpdateAccountParams{
+					ID:      account.ID,
+					Balance: account.Balance + 10,
+				})).Times(1).Return(account, nil)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNoContent, recorder.Code)
+			},
+		},
+		{
+			"InvalidId",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = "eee"
+				body = []byte(fmt.Sprintf(`{"balance":%d}`, 10))
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).Times(0)
+				store.EXPECT().UpdateAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			"InvalidBody",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+				body = []byte("this will fail")
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			"NotFound",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+				body = []byte(fmt.Sprintf(`{"balance":%d}`, int64(10)))
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
+				store.EXPECT().UpdateAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			"InternalError during select",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+				body = []byte(fmt.Sprintf(`{"balance":%d}`, int64(10)))
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, sql.ErrConnDone)
+				store.EXPECT().UpdateAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			"InternalError during update",
+			func(store *mockdb.MockStore) {
+				account = randomAccount()
+				accountId = strconv.FormatInt(account.ID, 10)
+				body = []byte(fmt.Sprintf(`{"balance":%d}`, int64(10)))
+
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(account, nil)
+				store.EXPECT().UpdateAccount(gomock.Any(), gomock.Eq(db.UpdateAccountParams{
+					ID:      account.ID,
+					Balance: account.Balance + 10,
+				})).Times(1).Return(db.Account{}, sql.ErrConnDone)
+			},
+			func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			controller := gomock.NewController(t)
+			defer controller.Finish()
+
+			store := mockdb.NewMockStore(controller)
+			tc.buildStubs(store)
+
+			// start the server and send request
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+			url := fmt.Sprintf("/accounts/%s", accountId)
+
+			request, err := http.NewRequest("PATCH", url, bytes.NewBuffer(body))
+			request.Header.Set("Content-Type", "application/json")
 			require.NoError(t, err)
 
 			server.router.ServeHTTP(recorder, request)
