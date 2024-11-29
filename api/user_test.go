@@ -110,7 +110,7 @@ func TestCreateUser(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start the server and send request
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := "/users"
 			data, err := json.Marshal(tc.body)

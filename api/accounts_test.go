@@ -92,7 +92,7 @@ func TestGetAccount(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start the server and send request
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := fmt.Sprintf("/accounts/%d", tc.accountId)
 
@@ -197,7 +197,7 @@ func TestCreateAccount(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start the server and send request
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := "/accounts"
 
@@ -276,7 +276,7 @@ func TestListAccounts(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start the server and send request
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			request, err := http.NewRequest("GET", fmt.Sprintf("/accounts%s", query), nil)
@@ -399,7 +399,7 @@ func TestUpdateAccounts(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start the server and send request
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := fmt.Sprintf("/accounts/%s", accountId)
 
@@ -500,7 +500,7 @@ func TestDeleteAccount(t *testing.T) {
 
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := fmt.Sprintf("/accounts/%s", accountId)
 			request, err := http.NewRequest("DELETE", url, nil)
