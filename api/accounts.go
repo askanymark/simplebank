@@ -7,10 +7,10 @@ import (
 	"github.com/lib/pq"
 	"net/http"
 	db "simplebank/db/sqlc"
+	"simplebank/token"
 )
 
 type createAccountRequest struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,currency"`
 }
 
@@ -22,8 +22,9 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateAccountParams{
-		Owner:    request.Owner,
+		Owner:    authPayload.Username,
 		Currency: request.Currency,
 		Balance:  0,
 	}
@@ -70,6 +71,13 @@ func (server *Server) getAccount(context *gin.Context) {
 		return
 	}
 
+	authPayload := context.MustGet(authorizationPayloadKey).(*token.Payload)
+	if account.Owner != authPayload.Username {
+		err := errors.New("account does not belong to the authenticated user")
+		context.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	context.JSON(http.StatusOK, account)
 }
 
@@ -86,7 +94,9 @@ func (server *Server) listAccounts(context *gin.Context) {
 		return
 	}
 
+	authPayload := context.MustGet(authorizationPayloadKey).(*token.Payload)
 	accounts, err := server.store.ListAccounts(context, db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Limit:  int64(req.PageSize),
 		Offset: int64((req.PageID - 1) * req.PageSize),
 	})
