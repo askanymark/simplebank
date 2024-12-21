@@ -14,7 +14,7 @@ jobs:
     - name: Kubectl tool installer
       uses: Azure/setup-kubectl@v4.0.0
       with:
-          version: '1.31'
+        version: '1.31'
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -44,5 +44,4 @@ jobs:
           kubectl apply -f eks/aws-auth.yml
           kubectl apply -f eks/deployment.yml
           kubectl apply -f eks/service.yml
-#          kubectl apply -f eks/issuer.yml
           kubectl apply -f eks/ingress.yml
