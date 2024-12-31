@@ -8,6 +8,7 @@
 4. [sqlc](https://github.com/sqlc-dev/sqlc)
 5. [mockgen](https://github.com/uber-go/mock)
 6. [gRPC dependencies for go](https://grpc.io/docs/languages/go/quickstart/)
+7. [statik](https://github.com/rakyll/statik)
 
 Database can be set up via Makefile
 

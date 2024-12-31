@@ -45,5 +45,6 @@ proto:
 		--openapiv2_out=docs/swagger \
 		--openapiv2_opt=allow_merge=true,merge_file_name=simplebank \
 		proto/*.proto
+	statik -src=./docs/swagger -dest=./docs
 
 .PHONY: postgres createdb migrateup sqlc mock proto
