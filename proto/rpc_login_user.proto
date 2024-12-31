@@ -4,7 +4,6 @@ package pb;
 
 option go_package = "simplebank/pb";
 
-import "rpc_create_user.proto";
 import "google/protobuf/timestamp.proto";
 import "user.proto";
 
