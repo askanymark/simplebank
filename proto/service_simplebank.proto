@@ -2,11 +2,24 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "simplebank/pb";
-
 import "rpc_create_user.proto";
 import "rpc_login_user.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "simplebank/pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Simplebank API";
+    version: "1.0";
+    contact: {
+      name: "Marks Paskannijs";
+      url: "https://github.com/askanymark/simplebank";
+      email: "marks@askanymark.io";
+    };
+  };
+};
 
 service Simplebank {
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
