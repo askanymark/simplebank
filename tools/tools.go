@@ -9,3 +9,5 @@ import (
 	_ "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
 	_ "google.golang.org/protobuf/cmd/protoc-gen-go"
 )
+
+// TODO when Go 1.24 is out, refactor this using the new "tool" directive in go.mod
