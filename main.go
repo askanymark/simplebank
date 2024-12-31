@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"github.com/rakyll/statik/fs"
@@ -30,6 +34,8 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot connect to database:", err)
 	}
+
+	runDbMigration(config.MigrationUri, config.DBUri)
 
 	store := db.NewStore(conn)
 	//runGinServer(err, config, store)
@@ -118,4 +124,17 @@ func runGinServer(err error, config util.Config, store db.Store) {
 	if err != nil {
 		log.Fatal("cannot start http server:", err)
 	}
+}
+
+func runDbMigration(migrationUri, dbUri string) {
+	migration, err := migrate.New(migrationUri, dbUri)
+	if err != nil {
+		log.Fatal("cannot create new migrate instance:", err)
+	}
+
+	if err = migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatal("cannot run migrate up:", err)
+	}
+
+	log.Println("db migrated successfully")
 }
