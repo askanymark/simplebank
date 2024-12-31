@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package pb;
 
-import "google/protobuf/timestamp.proto";
-
 option go_package = "simplebank/pb";
+
+import "google/protobuf/timestamp.proto";
 
 message User {
   string username = 1;
