@@ -12,6 +12,7 @@ LIMIT 1;
 -- name: UpdateUser :one
 UPDATE users
 SET hashed_password = coalesce(sqlc.narg(hashed_password), hashed_password),
+    password_changed_at = coalesce(sqlc.narg(password_changed_at), password_changed_at),
     full_name       = coalesce(sqlc.narg(full_name), full_name),
     email           = coalesce(sqlc.narg(email), email)
 WHERE username = sqlc.arg(username)
