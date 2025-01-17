@@ -22,6 +22,9 @@ migratedown1:
 sqlc:
 	sqlc generate
 
+redis:
+	docker run --name redis -p 6379:6379 -d redis:alpine
+
 test:
 	go test -v -cover ./...
 
@@ -47,4 +50,4 @@ proto:
 		proto/*.proto
 	statik -src=./docs/swagger -dest=./docs
 
-.PHONY: postgres createdb migrateup sqlc mock proto
+.PHONY: postgres createdb migrateup sqlc mock proto redis
