@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	CI                   bool          `mapstructure:"CI"`
 	Environment          string        `mapstructure:"ENVIRONMENT"`
 	DBDriver             string        `mapstructure:"DB_DRIVER"`
 	DBUri                string        `mapstructure:"DB_URI"`

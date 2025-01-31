@@ -10,6 +10,10 @@ func TestGmailSender_SendEmail(t *testing.T) {
 	config, err := util.LoadConfig("..")
 	require.NoError(t, err)
 
+	if config.CI {
+		return
+	}
+
 	sender := NewProtonSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
 	subject := "Hello World"
 	content := "plain text string"
