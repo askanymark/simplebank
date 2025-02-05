@@ -17,13 +17,17 @@ type ProtonSender struct {
 	name              string
 	fromEmailAddress  string
 	fromEmailPassword string
+	certPath          string
+	keyPath           string
 }
 
-func NewProtonSender(username, fromEmailAddress, fromEmailPassword string) EmailSender {
+func NewProtonSender(username, fromEmailAddress, fromEmailPassword, certPath, keyPath string) EmailSender {
 	return &ProtonSender{
 		name:              username,
 		fromEmailAddress:  fromEmailAddress,
 		fromEmailPassword: fromEmailPassword,
+		certPath:          certPath,
+		keyPath:           keyPath,
 	}
 }
 
@@ -47,13 +51,13 @@ func (sender ProtonSender) SendEmail(subject, content string, to, cc, bcc, attac
 	}
 
 	message.Subject(subject)
-	message.SetBodyString(mail.TypeTextPlain, content)
+	message.SetBodyString(mail.TypeTextPlain, content) // TODO HTML string
 
 	for _, file := range attachedFiles {
 		message.AttachFile(file)
 	}
 
-	keypair, err := tls.LoadX509KeyPair("cert.pem", "key.pem")
+	keypair, err := tls.LoadX509KeyPair(sender.certPath, sender.keyPath)
 	if err != nil {
 		return err
 	}

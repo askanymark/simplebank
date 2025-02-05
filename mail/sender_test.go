@@ -14,7 +14,7 @@ func TestGmailSender_SendEmail(t *testing.T) {
 		return
 	}
 
-	sender := NewProtonSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	sender := NewProtonSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword, config.CertificatePath, config.KeyPath)
 	subject := "Hello World"
 	content := "plain text string"
 	to := []string{config.EmailSenderName} // self
