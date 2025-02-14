@@ -9,6 +9,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 	db "simplebank/db/sqlc"
+	"simplebank/mail"
 	"simplebank/util"
 )
 
@@ -67,11 +68,14 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	subject := "Welcome to Simple Bank"
 	// TODO proper server url
 	verifyUrl := fmt.Sprintf("http://127.0.0.1:8080/verify_email?id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
-	content := fmt.Sprintf(`Hello %s,<br/>
-	Thank you for registering with us!<br/>
-	Please <a href="%s">click here<a/> to verify your email address.<br/>`, user.FullName, verifyUrl)
+
+	data := mail.EmailData{
+		FullName:  user.FullName,
+		VerifyURL: verifyUrl,
+	}
+
 	to := []string{user.Email}
-	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
+	err = processor.mailer.SendEmail(subject, data, to, nil, nil, nil)
 	if err != nil {
 		return fmt.Errorf("failed to send verify email: %w", err)
 	}

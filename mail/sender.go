@@ -2,7 +2,10 @@ package mail
 
 import (
 	"crypto/tls"
+	"fmt"
 	"github.com/wneessen/go-mail"
+	ht "html/template"
+	tt "text/template"
 )
 
 const (
@@ -10,7 +13,7 @@ const (
 )
 
 type EmailSender interface {
-	SendEmail(subject, content string, to, cc, bcc, attachedFiles []string) error
+	SendEmail(subject string, content EmailData, to, cc, bcc, attachedFiles []string) error
 }
 
 type ProtonSender struct {
@@ -19,6 +22,11 @@ type ProtonSender struct {
 	fromEmailPassword string
 	certPath          string
 	keyPath           string
+}
+
+type EmailData struct {
+	FullName  string
+	VerifyURL string
 }
 
 func NewProtonSender(username, fromEmailAddress, fromEmailPassword, certPath, keyPath string) EmailSender {
@@ -31,7 +39,7 @@ func NewProtonSender(username, fromEmailAddress, fromEmailPassword, certPath, ke
 	}
 }
 
-func (sender ProtonSender) SendEmail(subject, content string, to, cc, bcc, attachedFiles []string) error {
+func (sender ProtonSender) SendEmail(subject string, content EmailData, to, cc, bcc, attachedFiles []string) error {
 	message := mail.NewMsg()
 
 	if err := message.From(sender.fromEmailAddress); err != nil {
@@ -51,7 +59,33 @@ func (sender ProtonSender) SendEmail(subject, content string, to, cc, bcc, attac
 	}
 
 	message.Subject(subject)
-	message.SetBodyString(mail.TypeTextPlain, content) // TODO HTML string
+
+	textBodyTemplate := `Hello {{.FullName}}!
+
+Thank you for registering with us!
+Please verify your email address by clicking this link: {{.VerifyURL}}`
+
+	htmlBodyTemplate := `Hello <b>{{.FullName}}!</b><br/>
+Thank you for registering with us!<br/>
+Please <a href="{{.VerifyURL}}" target="_blank">click here<a/> to verify your email address`
+
+	textTmpl, err := tt.New("verify_email_text").Parse(textBodyTemplate)
+	if err != nil {
+		return fmt.Errorf("failed to parse text template: %w", err)
+	}
+
+	htmlTmpl, err := ht.New("verify_email_html").Parse(htmlBodyTemplate)
+	if err != nil {
+		return fmt.Errorf("failed to parse html template: %w", err)
+	}
+
+	if err = message.SetBodyTextTemplate(textTmpl, content); err != nil {
+		return fmt.Errorf("failed to add text template to mail body: %w", err)
+	}
+
+	if err = message.AddAlternativeHTMLTemplate(htmlTmpl, content); err != nil {
+		return fmt.Errorf("failed to add html template to mail body: %w", err)
+	}
 
 	for _, file := range attachedFiles {
 		message.AttachFile(file)

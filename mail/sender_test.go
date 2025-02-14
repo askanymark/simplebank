@@ -16,10 +16,13 @@ func TestGmailSender_SendEmail(t *testing.T) {
 
 	sender := NewProtonSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword, config.CertificatePath, config.KeyPath)
 	subject := "Hello World"
-	content := "plain text string"
 	to := []string{config.EmailSenderName} // self
 	files := []string{"../README.md"}
+	data := EmailData{
+		FullName:  "John Doe",
+		VerifyURL: "http://127.0.0.1:8080/verify_email?id=1&secret_code",
+	}
 
-	err = sender.SendEmail(subject, content, to, nil, nil, files)
+	err = sender.SendEmail(subject, data, to, nil, nil, files)
 	require.NoError(t, err)
 }
