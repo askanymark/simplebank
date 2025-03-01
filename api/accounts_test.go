@@ -58,7 +58,7 @@ func TestGetAccount(t *testing.T) {
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
 					Times(1).
-					Return(db.Account{}, sql.ErrNoRows)
+					Return(db.Account{}, db.ErrRecordNotFound)
 			},
 			func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -434,7 +434,7 @@ func TestUpdateAccounts(t *testing.T) {
 			func(store *mockdb.MockStore) {
 				accountId = strconv.FormatInt(account.ID, 10)
 
-				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, db.ErrRecordNotFound)
 				store.EXPECT().UpdateAccount(gomock.Any(), gomock.Any()).Times(0)
 			},
 			func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -560,7 +560,7 @@ func TestDeleteAccount(t *testing.T) {
 			func(store *mockdb.MockStore) {
 				accountId = strconv.FormatInt(account.ID, 10)
 
-				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, sql.ErrNoRows)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(db.Account{}, db.ErrRecordNotFound)
 				store.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).Times(0)
 			},
 			func(t *testing.T, recorder *httptest.ResponseRecorder) {

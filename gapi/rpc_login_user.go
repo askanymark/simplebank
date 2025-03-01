@@ -2,8 +2,8 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,7 +22,7 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 
 	user, err := server.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "cannot find user: %v", err)
 		}
 
@@ -52,7 +52,10 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		UserAgent:    metadata.UserAgent,
 		ClientIp:     metadata.ClientIP,
 		IsBlocked:    false,
-		ExpiresAt:    refreshPayload.ExpiredAt,
+		ExpiresAt: pgtype.Timestamp{
+			Time:  refreshPayload.ExpiredAt,
+			Valid: true,
+		},
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create session: %v", err)

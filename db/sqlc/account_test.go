@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"github.com/stretchr/testify/require"
 	"simplebank/util"
 	"testing"
@@ -17,7 +16,7 @@ func createRandomAccount(t *testing.T) Account {
 		Currency: util.RandomCurrency(),
 	}
 
-	account, err := testQueries.CreateAccount(context.Background(), arg)
+	account, err := testStore.CreateAccount(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
 
@@ -37,7 +36,7 @@ func TestCreateAccount(t *testing.T) {
 
 func TestGetAccount(t *testing.T) {
 	createdAccount := createRandomAccount(t)
-	dbRecord, err := testQueries.GetAccount(context.Background(), createdAccount.ID)
+	dbRecord, err := testStore.GetAccount(context.Background(), createdAccount.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, dbRecord)
@@ -57,7 +56,7 @@ func TestUpdateAccount(t *testing.T) {
 		Balance: util.RandomMoney(),
 	}
 
-	account, err := testQueries.UpdateAccount(context.Background(), arg)
+	account, err := testStore.UpdateAccount(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
 
@@ -67,12 +66,12 @@ func TestUpdateAccount(t *testing.T) {
 
 func TestDeleteAccount(t *testing.T) {
 	createdAccount := createRandomAccount(t)
-	err := testQueries.DeleteAccount(context.Background(), createdAccount.ID)
+	err := testStore.DeleteAccount(context.Background(), createdAccount.ID)
 	require.NoError(t, err)
 
-	dbRecord, err := testQueries.GetAccount(context.Background(), createdAccount.ID)
+	dbRecord, err := testStore.GetAccount(context.Background(), createdAccount.ID)
 	require.Error(t, err)
-	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.EqualError(t, err, ErrRecordNotFound.Error())
 	require.Empty(t, dbRecord)
 }
 
@@ -89,7 +88,7 @@ func TestListAccounts(t *testing.T) {
 		Offset: 0,
 	}
 
-	accounts, err := testQueries.ListAccounts(context.Background(), arg)
+	accounts, err := testStore.ListAccounts(context.Background(), arg)
 	require.NoError(t, err)
 
 	require.NotEmpty(t, accounts)

@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	_ "github.com/lib/pq"
 	db "simplebank/db/sqlc"
 	"simplebank/token"
 	"simplebank/util"
