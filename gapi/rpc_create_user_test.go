@@ -43,8 +43,8 @@ func (expected *eqCreateUserTxParamsMatcher) Matches(x interface{}) bool {
 	return err == nil
 }
 
-func (e *eqCreateUserTxParamsMatcher) String() string {
-	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
+func (expected *eqCreateUserTxParamsMatcher) String() string {
+	return fmt.Sprintf("matches arg %v and password %v", expected.arg, expected.password)
 }
 
 func EqCreateUserTxParams(arg db.CreateUserTxParams, password string, user db.User) gomock.Matcher {
