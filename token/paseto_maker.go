@@ -19,7 +19,7 @@ func NewPasetoMaker(symmetricKey []byte) (Maker, error) {
 
 	maker := &PasetoMaker{
 		paseto:       paseto.NewV2(),
-		symmetricKey: []byte(symmetricKey),
+		symmetricKey: symmetricKey,
 	}
 
 	return maker, nil
