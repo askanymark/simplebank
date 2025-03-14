@@ -1,8 +1,14 @@
 module simplebank
 
-go 1.22.0
+go 1.24.1
 
-toolchain go1.23.0
+tool (
+ 	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+	github.com/rakyll/statik
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	google.golang.org/protobuf/cmd/protoc-gen-go
+)
 
 require (
 	github.com/gin-gonic/gin v1.10.0
