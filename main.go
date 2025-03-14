@@ -170,9 +170,14 @@ func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config uti
 	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(statikFs))
 	mux.Handle("/swagger/", swaggerHandler)
 
-	c := cors.Default().Handler(gapi.HttpLogger(mux))
+	c := cors.New(cors.Options{
+		// probably better to use a list from env file
+		AllowedOrigins: []string{"http://localhost:3000", "https://simplebank.askanymark.io"},
+		AllowedMethods: []string{"GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"},
+	})
+	handler := c.Handler(gapi.HttpLogger(mux))
 	httpServer := &http.Server{
-		Handler: c,
+		Handler: handler,
 		Addr:    config.HTTPServerAddress,
 	}
 
