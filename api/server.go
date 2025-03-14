@@ -26,7 +26,10 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	server := &Server{store: store, tokenMaker: tokenMaker, config: config}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("currency", validCurrency)
+		err := v.RegisterValidation("currency", validCurrency)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	registerRoutes(server)
