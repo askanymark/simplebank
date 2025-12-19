@@ -3,6 +3,19 @@ package main
 import (
 	"context"
 	"errors"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	db "simplebank/db/sqlc"
+	_ "simplebank/docs/statik"
+	"simplebank/gapi"
+	"simplebank/mail"
+	"simplebank/pb"
+	"simplebank/util"
+	"simplebank/worker"
+	"syscall"
+
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -18,18 +31,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	db "simplebank/db/sqlc"
-	_ "simplebank/docs/statik"
-	"simplebank/gapi"
-	"simplebank/mail"
-	"simplebank/pb"
-	"simplebank/util"
-	"simplebank/worker"
-	"syscall"
 )
 
 var interruptSignals = []os.Signal{os.Interrupt, syscall.SIGTERM, syscall.SIGINT}

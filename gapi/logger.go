@@ -2,14 +2,16 @@ package gapi
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"net/http"
-	"time"
 )
 
+// GrpcLogger is a gRPC server interceptor for logging request metadata, response status, and execution time.
 func GrpcLogger(
 	ctx context.Context,
 	req interface{},
@@ -48,16 +50,19 @@ type ResponseRecorder struct {
 	Body       []byte
 }
 
+// WriteHeader sets the status code for the HTTP response and forwards it to the underlying ResponseWriter.
 func (recorder *ResponseRecorder) WriteHeader(statusCode int) {
 	recorder.StatusCode = statusCode
 	recorder.ResponseWriter.WriteHeader(statusCode)
 }
 
+// Write writes the provided byte slice to the response body and forwards it to the underlying ResponseWriter.
 func (recorder *ResponseRecorder) Write(data []byte) (int, error) {
 	recorder.Body = data
 	return recorder.ResponseWriter.Write(data)
 }
 
+// HttpLogger wraps an HTTP handler to log request details such as method, path, status code, and response time.
 func HttpLogger(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()

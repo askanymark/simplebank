@@ -2,10 +2,11 @@ package worker
 
 import (
 	"context"
-	"github.com/hibiken/asynq"
-	"github.com/rs/zerolog/log"
 	db "simplebank/db/sqlc"
 	"simplebank/mail"
+
+	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -25,6 +26,7 @@ type RedisTaskProcessor struct {
 	mailer mail.EmailSender
 }
 
+// NewRedisTaskProcessor initializes and returns a TaskProcessor backed by Redis with task queue configuration.
 func NewRedisTaskProcessor(options asynq.RedisClientOpt, store db.Store, mailer mail.EmailSender) TaskProcessor {
 	server := asynq.NewServer(options, asynq.Config{
 		Queues: map[string]int{

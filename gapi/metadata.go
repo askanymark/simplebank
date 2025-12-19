@@ -2,6 +2,7 @@ package gapi
 
 import (
 	"context"
+
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 )
@@ -17,6 +18,7 @@ type Metadata struct {
 	ClientIP  string
 }
 
+// extractMetadata retrieves metadata from the provided context, including user-agent and client IP information.
 func (server *Server) extractMetadata(ctx context.Context) *Metadata {
 	mtdt := &Metadata{}
 

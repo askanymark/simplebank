@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/spf13/viper"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -24,6 +25,7 @@ type Config struct {
 	KeyPath              string        `mapstructure:"KEY_PATH"`
 }
 
+// LoadConfig loads application configuration from the specified path using the Viper library and environment variables.
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")

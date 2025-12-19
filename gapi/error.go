@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// fieldViolation returns a BadRequest_FieldViolation with the given field and error message
 func fieldViolation(field string, err error) *errdetails.BadRequest_FieldViolation {
 	return &errdetails.BadRequest_FieldViolation{
 		Field:       field,
@@ -13,6 +14,7 @@ func fieldViolation(field string, err error) *errdetails.BadRequest_FieldViolati
 	}
 }
 
+// invalidArgumentError creates and returns an error representing invalid argument violations with detailed field errors
 func invalidArgumentError(violations []*errdetails.BadRequest_FieldViolation) error {
 	badRequest := &errdetails.BadRequest{FieldViolations: violations}
 	statusInvalid := status.New(codes.InvalidArgument, "invalid arguments")
@@ -24,6 +26,7 @@ func invalidArgumentError(violations []*errdetails.BadRequest_FieldViolation) er
 	return statusDetails.Err()
 }
 
+// unauthenticatedError creates a gRPC error with the 'Unauthenticated' code and includes the provided error message.
 func unauthenticatedError(err error) error {
 	return status.Errorf(codes.Unauthenticated, "unauthenticated: %s", err)
 }

@@ -11,6 +11,7 @@ var (
 	isValidFullName = regexp.MustCompile(`^[a-zA-Z\s]+$`).MatchString
 )
 
+// ValidateString checks if the length of the input string is within the specified minimum and maximum range.
 func ValidateString(value string, minLength int, maxLength int) error {
 	n := len(value)
 
@@ -21,6 +22,7 @@ func ValidateString(value string, minLength int, maxLength int) error {
 	return nil
 }
 
+// ValidateUsername ensures the username is between 3 and 100 characters and contains only lowercase letters, numbers, and underscores.
 func ValidateUsername(value string) error {
 	err := ValidateString(value, 3, 100)
 	if err != nil {
@@ -34,10 +36,12 @@ func ValidateUsername(value string) error {
 	return nil
 }
 
+// ValidatePassword ensures the password is between 6 and 100 characters.
 func ValidatePassword(value string) error {
 	return ValidateString(value, 6, 100)
 }
 
+// ValidateEmail ensures the email address is between 6 and 100 characters and is a valid email address.
 func ValidateEmail(value string) error {
 	if err := ValidateString(value, 6, 100); err != nil {
 		return err
@@ -50,6 +54,7 @@ func ValidateEmail(value string) error {
 	return nil
 }
 
+// ValidateFullName ensures the input is between 3 and 100 characters and consists only of letters and spaces.
 func ValidateFullName(value string) error {
 	err := ValidateString(value, 3, 100)
 	if err != nil {
@@ -63,6 +68,7 @@ func ValidateFullName(value string) error {
 	return nil
 }
 
+// ValidateEmailId ensures the input is a positive integer.
 func ValidateEmailId(value int64) error {
 	if value <= 0 {
 		return fmt.Errorf("must be a positive integer")
@@ -71,6 +77,7 @@ func ValidateEmailId(value int64) error {
 	return nil
 }
 
+// ValidateSecretCode ensures the input is between 32 and 128 characters.
 func ValidateSecretCode(value string) error {
 	return ValidateString(value, 32, 128)
 }

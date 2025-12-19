@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -13,6 +14,7 @@ const (
 
 var ErrRecordNotFound = pgx.ErrNoRows
 
+// ErrorCode extracts and returns the error code from a PostgreSQL error, or an empty string if the error type does not match.
 func ErrorCode(err error) string {
 	var pgErr *pgconn.PgError
 
