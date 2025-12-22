@@ -168,18 +168,35 @@
       "type": "object",
       "properties": {
         "username": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 3,
+          "pattern": "^[a-z0-9_]+$"
         },
         "fullName": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 3,
+          "pattern": "^[a-zA-Z\\s]+$"
         },
         "email": {
-          "type": "string"
+          "type": "string",
+          "description": "RFC 5322",
+          "maxLength": 100,
+          "minLength": 6
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 6
         }
-      }
+      },
+      "required": [
+        "username",
+        "fullName",
+        "email",
+        "password"
+      ]
     },
     "pbCreateUserResponse": {
       "type": "object",
@@ -229,18 +246,32 @@
       "type": "object",
       "properties": {
         "username": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 3,
+          "pattern": "^[a-z0-9_]+$"
         },
         "fullName": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 3,
+          "pattern": "^[a-zA-Z\\s]+$"
         },
         "email": {
-          "type": "string"
+          "type": "string",
+          "description": "RFC 5322",
+          "maxLength": 100,
+          "minLength": 6
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 6
         }
-      }
+      },
+      "required": [
+        "username"
+      ]
     },
     "pbUpdateUserResponse": {
       "type": "object",
