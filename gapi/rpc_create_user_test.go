@@ -3,8 +3,6 @@ package gapi
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
 	"reflect"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
@@ -14,6 +12,9 @@ import (
 	mockwk "simplebank/worker/mock"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 type eqCreateUserTxParamsMatcher struct {
@@ -77,7 +78,7 @@ func TestCreateUser(t *testing.T) {
 		name          string
 		body          *pb.CreateUserRequest
 		buildStubs    func(store *mockdb.MockStore, distributor *mockwk.MockTaskDistributor)
-		checkResponse func(t *testing.T, res *pb.CreateUserResponse, err error)
+		checkResponse func(t *testing.T, res *pb.User, err error)
 	}{
 		{
 			"Created",
@@ -109,13 +110,12 @@ func TestCreateUser(t *testing.T) {
 					Times(1).
 					Return(nil)
 			},
-			func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			func(t *testing.T, res *pb.User, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
-				createdUser := res.GetUser()
-				require.Equal(t, user.Username, createdUser.Username)
-				require.Equal(t, user.FullName, createdUser.FullName)
-				require.Equal(t, user.Email, createdUser.Email)
+				require.Equal(t, user.Username, res.Username)
+				require.Equal(t, user.FullName, res.FullName)
+				require.Equal(t, user.Email, res.Email)
 			},
 		},
 	}

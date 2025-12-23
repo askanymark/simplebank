@@ -2,19 +2,20 @@ package gapi
 
 import (
 	"context"
-	"github.com/hibiken/asynq"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
 	"simplebank/val"
 	"simplebank/worker"
 	"time"
+
+	"github.com/hibiken/asynq"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
 	violations := validateCreateUserRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
@@ -54,11 +55,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
 	}
 
-	userResponse := &pb.CreateUserResponse{
-		User: convertUser(txResult.User),
-	}
-
-	return userResponse, nil
+	return txResult.User.ToResponse(), nil
 }
 
 func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {

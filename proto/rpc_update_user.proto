@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package pb;
 
-import "user.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/api/field_behavior.proto";
 
@@ -43,8 +42,4 @@ message UpdateUserRequest {
       max_length: 100
     }
   ];
-}
-
-message UpdateUserResponse {
-  User user = 1;
 }

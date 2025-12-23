@@ -8,6 +8,7 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "rpc_update_user.proto";
 import "rpc_verify_email.proto";
+import "user.proto";
 
 option go_package = "simplebank/pb";
 
@@ -24,7 +25,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service Simplebank {
-  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+  rpc CreateUser (CreateUserRequest) returns (User) {
     option (google.api.http) = {
       post: "/v1/create_user"
       body: "*"
@@ -35,7 +36,7 @@ service Simplebank {
       description: "Use this API to create a new user";
     };
   }
-  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+  rpc UpdateUser (UpdateUserRequest) returns (User) {
     option (google.api.http) = {
       put: "/v1/update_user"
       body: "*"

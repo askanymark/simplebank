@@ -3,18 +3,19 @@ package gapi
 import (
 	"context"
 	"errors"
-	"github.com/jackc/pgx/v5/pgtype"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
 	"simplebank/val"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
+func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -70,11 +71,7 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err)
 	}
 
-	userResponse := &pb.UpdateUserResponse{
-		User: convertUser(user),
-	}
-
-	return userResponse, nil
+	return user.ToResponse(), nil
 }
 
 func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {

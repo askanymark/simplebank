@@ -3,15 +3,16 @@ package gapi
 import (
 	"context"
 	"errors"
+	db "simplebank/db/sqlc"
+	"simplebank/pb"
+	"simplebank/util"
+	"simplebank/val"
+
 	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	db "simplebank/db/sqlc"
-	"simplebank/pb"
-	"simplebank/util"
-	"simplebank/val"
 )
 
 func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
@@ -67,7 +68,7 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		AccessTokenExpiresAt:  timestamppb.New(accessPayload.ExpiredAt),
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: timestamppb.New(refreshPayload.ExpiredAt),
-		User:                  convertUser(user),
+		User:                  user.ToResponse(),
 	}
 	return response, nil
 }

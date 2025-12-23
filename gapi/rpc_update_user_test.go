@@ -2,9 +2,6 @@ package gapi
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -12,6 +9,10 @@ import (
 	"simplebank/util"
 	"testing"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestUpdateUserAPI(t *testing.T) {
@@ -25,7 +26,7 @@ func TestUpdateUserAPI(t *testing.T) {
 		req           *pb.UpdateUserRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, resp *pb.UpdateUserResponse, err error)
+		checkResponse func(t *testing.T, resp *pb.User, err error)
 	}{
 		{
 			"OK",
@@ -62,13 +63,12 @@ func TestUpdateUserAPI(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, resp *pb.UpdateUserResponse, err error) {
+			func(t *testing.T, res *pb.User, err error) {
 				require.NoError(t, err)
-				require.NotNil(t, resp)
-				updatedUser := resp.GetUser()
-				require.Equal(t, user.Username, updatedUser.Username)
-				require.Equal(t, newName, updatedUser.FullName)
-				require.Equal(t, newEmail, updatedUser.Email)
+				require.NotNil(t, res)
+				require.Equal(t, user.Username, res.Username)
+				require.Equal(t, newName, res.FullName)
+				require.Equal(t, newEmail, res.Email)
 			},
 		},
 	}

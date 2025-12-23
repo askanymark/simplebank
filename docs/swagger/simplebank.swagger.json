@@ -30,7 +30,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pbCreateUserResponse"
+              "$ref": "#/definitions/pbUser"
             }
           },
           "default": {
@@ -98,7 +98,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pbUpdateUserResponse"
+              "$ref": "#/definitions/pbUser"
             }
           },
           "default": {
@@ -198,14 +198,6 @@
         "password"
       ]
     },
-    "pbCreateUserResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/pbUser"
-        }
-      }
-    },
     "pbLoginUserRequest": {
       "type": "object",
       "properties": {
@@ -272,14 +264,6 @@
       "required": [
         "username"
       ]
-    },
-    "pbUpdateUserResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/pbUser"
-        }
-      }
     },
     "pbUser": {
       "type": "object",
