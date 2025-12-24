@@ -29,7 +29,7 @@ redis:
 	docker run --name redis -p 6379:6379 -d redis:alpine
 
 test:
-	go test -v -cover ./...
+	GOTOOLCHAIN=go1.25.5+auto go test -v -cover ./...
 
 server:
 	go run main.go
