@@ -15,13 +15,13 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-migrate/migrate/v4 v4.18.2
-	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
 	github.com/hibiken/asynq v0.25.1
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/o1egl/paseto v1.0.0
 	github.com/rakyll/statik v0.1.7
+	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
 	github.com/wneessen/go-mail v0.6.2
@@ -69,7 +69,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/redis/go-redis/v9 v9.7.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	github.com/rs/cors v1.11.1 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

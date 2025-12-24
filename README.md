@@ -2,7 +2,7 @@
 
 ## Requirements
 
-1. Go 1.24.1
+1. Go 1.25.5
 2. Docker
 3. [golang-migrate](https://github.com/golang-migrate/migrate)
 4. [sqlc](https://github.com/sqlc-dev/sqlc)
