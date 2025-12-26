@@ -9,6 +9,8 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "rpc_update_user.proto";
 import "rpc_verify_email.proto";
 import "user.proto";
+import "account.proto";
+import "rpc_create_account.proto";
 
 option go_package = "simplebank/pb";
 
@@ -66,6 +68,18 @@ service Simplebank {
       tags: ["User"];
       summary: "Verify email";
       description: "Use this API to verify email";
+    };
+  }
+
+  rpc CreateAccount (CreateAccountRequest) returns (Account) {
+    option (google.api.http) = {
+      post: "/v1/account",
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Account"];
+      summary: "Create account";
+      description: "Creates a new account for the logged in user";
     };
   }
 }

@@ -21,6 +21,40 @@
     "application/json"
   ],
   "paths": {
+    "/v1/account": {
+      "post": {
+        "summary": "Create account",
+        "description": "Creates a new account for the logged in user",
+        "operationId": "Simplebank_CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbAccount"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Account"
+        ]
+      }
+    },
     "/v1/create_user": {
       "post": {
         "summary": "Create a new user",
@@ -164,6 +198,46 @@
     }
   },
   "definitions": {
+    "pbAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "string",
+          "format": "int64"
+        },
+        "currency": {
+          "$ref": "#/definitions/pbCurrency"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbCreateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/definitions/pbCurrency",
+          "enum": [
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "description": "Type of currency that will be used for this account. Note: you cannot change account's currency after creating it"
+        }
+      },
+      "required": [
+        "currency"
+      ]
+    },
     "pbCreateUserRequest": {
       "type": "object",
       "properties": {
@@ -197,6 +271,15 @@
         "email",
         "password"
       ]
+    },
+    "pbCurrency": {
+      "type": "string",
+      "enum": [
+        "USD",
+        "EUR",
+        "GBP"
+      ],
+      "default": "USD"
     },
     "pbLoginUserRequest": {
       "type": "object",

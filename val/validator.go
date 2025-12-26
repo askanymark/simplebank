@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/mail"
 	"regexp"
+	"simplebank/util"
 )
 
 var (
@@ -80,4 +81,12 @@ func ValidateEmailId(value int64) error {
 // ValidateSecretCode ensures the input is between 32 and 128 characters.
 func ValidateSecretCode(value string) error {
 	return ValidateString(value, 32, 128)
+}
+
+func ValidateCurrency(value string) error {
+	if !util.IsSupportedCurrency(value) {
+		return fmt.Errorf("invalid currency")
+	}
+
+	return nil
 }
