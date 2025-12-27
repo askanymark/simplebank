@@ -55,6 +55,52 @@
         ]
       }
     },
+    "/v1/transactions": {
+      "get": {
+        "summary": "List transactions",
+        "description": "Lists transactions for all user owned accounts",
+        "operationId": "Simplebank_ListTransactions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbListTransactionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Transaction"
+        ]
+      }
+    },
     "/v1/users": {
       "post": {
         "summary": "Create a new user",
@@ -279,6 +325,21 @@
       ],
       "default": "USD"
     },
+    "pbListTransactionsResponse": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/definitions/pbPagination"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbTransaction"
+          }
+        }
+      }
+    },
     "pbLoginUserRequest": {
       "type": "object",
       "properties": {
@@ -312,6 +373,48 @@
         "refreshTokenExpiresAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "pbPagination": {
+      "type": "object",
+      "properties": {
+        "next": {
+          "type": "string",
+          "description": "The cursor to the next page. If it's missing, there is no next page"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "description": "The total number of items in the paginated response"
+        }
+      },
+      "required": [
+        "count"
+      ]
+    },
+    "pbTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "credit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "debit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "balance": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
