@@ -14,9 +14,11 @@ Database can be set up via Makefile
 
 ## Things to know
 
-- Use `make sqlc` to generate Go code for the database from SQL schema
-- mockgen is used to generate mocks for interfaces that cover the database and task distributor 
-- There is an OpenAPI specification available in the form of Swagger UI at http://localhost:8080/swagger. It is generated from the gRPC service definition inside `proto` directory and then compiled into static assets using statik. This is what HTTP gateway is used for
+- There are two APIs available. gRPC is the main one, and the REST is available via HTTP gateway provided by `grpc-gateway`
+  - At this moment, api package written in Gin is not used and will be removed
+- `sqlc` generates Go code for the database from SQL schema
+- `mockgen` generates mocks for interfaces that cover the database and task distributor 
+- OpenAPI specification is available in the form of Swagger UI at http://localhost:8080/swagger. It is generated from the gRPC service definition inside `proto` directory. The static assets then get compiled into serveable Go file using `statik`
 
 ## Useful commands
 
