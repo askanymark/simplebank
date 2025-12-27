@@ -17,7 +17,7 @@ option go_package = "simplebank/pb";
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Simplebank API";
-    version: "1.1";
+    version: "1.0";
     contact: {
       name: "Marks Paskannijs";
       url: "https://github.com/askanymark/simplebank";
@@ -29,7 +29,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service Simplebank {
   rpc CreateUser (CreateUserRequest) returns (User) {
     option (google.api.http) = {
-      post: "/v1/create_user"
+      post: "/v1/users"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -40,18 +40,18 @@ service Simplebank {
   }
   rpc UpdateUser (UpdateUserRequest) returns (User) {
     option (google.api.http) = {
-      put: "/v1/update_user"
+      put: "/v1/users"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["User"];
-      summary: "Update user";
+      summary: "Update existing user";
       description: "Use this API to update user";
     };
   }
   rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
     option (google.api.http) = {
-      post: "/v1/login_user"
+      post: "/v1/users/login"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -62,7 +62,7 @@ service Simplebank {
   }
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
-      get: "/v1/verify_email"
+      get: "/v1/users/verify"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["User"];
@@ -73,7 +73,7 @@ service Simplebank {
 
   rpc CreateAccount (CreateAccountRequest) returns (Account) {
     option (google.api.http) = {
-      post: "/v1/account",
+      post: "/v1/accounts",
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

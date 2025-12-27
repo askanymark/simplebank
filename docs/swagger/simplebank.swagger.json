@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Simplebank API",
-    "version": "1.1",
+    "version": "1.0",
     "contact": {
       "name": "Marks Paskannijs",
       "url": "https://github.com/askanymark/simplebank",
@@ -21,7 +21,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/account": {
+    "/v1/accounts": {
       "post": {
         "summary": "Create account",
         "description": "Creates a new account for the logged in user",
@@ -55,7 +55,7 @@
         ]
       }
     },
-    "/v1/create_user": {
+    "/v1/users": {
       "post": {
         "summary": "Create a new user",
         "description": "Use this API to create a new user",
@@ -87,9 +87,41 @@
         "tags": [
           "User"
         ]
+      },
+      "put": {
+        "summary": "Update existing user",
+        "description": "Use this API to update user",
+        "operationId": "Simplebank_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "User"
+        ]
       }
     },
-    "/v1/login_user": {
+    "/v1/users/login": {
       "post": {
         "summary": "Login user",
         "description": "Use this API to login user",
@@ -123,41 +155,7 @@
         ]
       }
     },
-    "/v1/update_user": {
-      "put": {
-        "summary": "Update user",
-        "description": "Use this API to update user",
-        "operationId": "Simplebank_UpdateUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbUser"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/pbUpdateUserRequest"
-            }
-          }
-        ],
-        "tags": [
-          "User"
-        ]
-      }
-    },
-    "/v1/verify_email": {
+    "/v1/users/verify": {
       "get": {
         "summary": "Verify email",
         "description": "Use this API to verify email",
