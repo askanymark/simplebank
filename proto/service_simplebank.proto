@@ -86,8 +86,7 @@ service Simplebank {
 
   rpc ListTransactions (ListTransactionsRequest) returns (ListTransactionsResponse) {
     option (google.api.http) = {
-      get: "/v1/transactions",
-      // TODO how do I convert request body into query params for HTTP?
+      get: "/v1/transactions"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Transaction"];

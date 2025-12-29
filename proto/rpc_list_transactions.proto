@@ -10,7 +10,12 @@ import "pagination.proto";
 import "transaction.proto";
 
 message ListTransactionsRequest {
-  optional int64 user_id = 1 [(google.api.field_behavior) = OPTIONAL];
+  optional string username = 1 [
+    (google.api.field_behavior) = OPTIONAL,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Bankers can specify username to list transactions for"
+    }
+  ];
 
   string cursor = 2;
 

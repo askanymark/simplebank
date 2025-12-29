@@ -76,11 +76,11 @@
         },
         "parameters": [
           {
-            "name": "userId",
+            "name": "username",
+            "description": "Bankers can specify username to list transactions for",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           },
           {
             "name": "cursor",
