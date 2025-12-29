@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hibiken/asynq"
-	"github.com/rs/zerolog/log"
 	db "simplebank/db/sqlc"
 	"simplebank/mail"
 	"simplebank/util"
+
+	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog/log"
 )
 
 const TaskSendVerifyEmail = "task:send_verify_email"
@@ -66,7 +67,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 
 	subject := "Welcome to Simple Bank"
 	// TODO proper server url
-	verifyUrl := fmt.Sprintf("http://localhost:8080/v1/verify_email?email_id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
+	verifyUrl := fmt.Sprintf("http://localhost:8080/v1/users/verify?email_id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
 
 	data := mail.EmailData{
 		FullName:  user.FullName,
