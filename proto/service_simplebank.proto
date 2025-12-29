@@ -39,6 +39,7 @@ service Simplebank {
       description: "Use this API to create a new user";
     };
   }
+
   rpc UpdateUser (UpdateUserRequest) returns (User) {
     option (google.api.http) = {
       put: "/v1/users"
@@ -50,6 +51,7 @@ service Simplebank {
       description: "Use this API to update user";
     };
   }
+
   rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
     option (google.api.http) = {
       post: "/v1/users/login"
@@ -61,6 +63,7 @@ service Simplebank {
       description: "Use this API to login user";
     };
   }
+
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       get: "/v1/users/verify"
