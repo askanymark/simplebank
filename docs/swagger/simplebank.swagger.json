@@ -101,6 +101,40 @@
         ]
       }
     },
+    "/v1/transfers": {
+      "post": {
+        "summary": "Create a new transfer",
+        "description": "Creates a new money transfer from one account to another",
+        "operationId": "Simplebank_CreateTransfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateTransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateTransferRequest"
+            }
+          }
+        ],
+        "tags": [
+          "transfers"
+        ]
+      }
+    },
     "/v1/users": {
       "post": {
         "summary": "Create a new user",
@@ -282,6 +316,61 @@
         "currency"
       ]
     },
+    "pbCreateTransferRequest": {
+      "type": "object",
+      "properties": {
+        "fromAccountId": {
+          "type": "string",
+          "format": "int64",
+          "description": "Where to send money from"
+        },
+        "toAccountId": {
+          "type": "string",
+          "format": "int64",
+          "description": "Where to send money to"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64",
+          "description": "The amount of money to transfer in the smallest currency"
+        },
+        "currency": {
+          "$ref": "#/definitions/pbCurrency",
+          "description": "Type of currency to transfer money in"
+        }
+      },
+      "required": [
+        "fromAccountId",
+        "toAccountId",
+        "amount",
+        "currency"
+      ]
+    },
+    "pbCreateTransferResponse": {
+      "type": "object",
+      "properties": {
+        "transfer": {
+          "$ref": "#/definitions/pbTransaction",
+          "description": "Transfer details"
+        },
+        "fromAccount": {
+          "$ref": "#/definitions/pbAccount",
+          "description": "Sender account state after transfer"
+        },
+        "toAccount": {
+          "$ref": "#/definitions/pbAccount",
+          "description": "Receiver account state after transfer"
+        },
+        "fromEntry": {
+          "$ref": "#/definitions/pbEntry",
+          "description": "Record made against sender account"
+        },
+        "toEntry": {
+          "$ref": "#/definitions/pbEntry",
+          "description": "Record made against receiver account"
+        }
+      }
+    },
     "pbCreateUserRequest": {
       "type": "object",
       "properties": {
@@ -324,6 +413,27 @@
         "GBP"
       ],
       "default": "USD"
+    },
+    "pbEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "accountId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     },
     "pbListTransactionsResponse": {
       "type": "object",

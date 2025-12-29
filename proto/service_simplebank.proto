@@ -12,6 +12,7 @@ import "user.proto";
 import "account.proto";
 import "rpc_create_account.proto";
 import "rpc_list_transactions.proto";
+import "rpc_create_transfer.proto";
 
 option go_package = "simplebank/pb";
 
@@ -95,6 +96,19 @@ service Simplebank {
       tags: ["Transaction"];
       summary: "List transactions";
       description: "Lists transactions for all user owned accounts"
+    };
+  }
+
+  rpc CreateTransfer (CreateTransferRequest) returns (CreateTransferResponse) {
+    option (google.api.http) = {
+      post: "/v1/transfers",
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["transfers"],
+      summary: "Create a new transfer",
+      description: "Creates a new money transfer from one account to another"
     };
   }
 }
