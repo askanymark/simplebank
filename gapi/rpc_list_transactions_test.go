@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -200,5 +201,9 @@ func randomTransfer(fromAccountID, toAccountID int64) db.Transfer {
 		ToAccountID:   toAccountID,
 		Amount:        util.RandomMoney(),
 		CreatedAt:     time.Now().UTC(),
+		Description: pgtype.Text{
+			String: util.RandomString(18),
+			Valid:  true,
+		},
 	}
 }

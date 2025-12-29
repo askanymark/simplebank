@@ -16,4 +16,6 @@ message Transaction {
   int64 debit = 4;
 
   int64 balance = 5;
+
+  optional string description = 6;
 }

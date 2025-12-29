@@ -49,7 +49,7 @@ func (server *Server) ListTransactions(ctx context.Context, req *pb.ListTransact
 	// Convert transfers to responses
 	transactions := make([]*pb.Transaction, len(transfers))
 	for i, transfer := range transfers {
-		transactions[i] = transfer.ToResponse()
+		transactions[i] = transfer.ToTransaction()
 	}
 
 	return &pb.ListTransactionsResponse{

@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (t Transfer) ToResponse() *pb.Transaction {
+func (t Transfer) ToTransaction() *pb.Transaction {
 	// TODO actual numbers
 	return &pb.Transaction{
 		Id:      t.ID,
@@ -14,5 +14,11 @@ func (t Transfer) ToResponse() *pb.Transaction {
 		Credit:  t.Amount,
 		Debit:   t.Amount,
 		Balance: 0,
+		Description: func() *string {
+			if t.Description.Valid {
+				return &t.Description.String
+			}
+			return nil
+		}(),
 	}
 }

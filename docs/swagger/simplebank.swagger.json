@@ -415,6 +415,9 @@
         "balance": {
           "type": "string",
           "format": "int64"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },

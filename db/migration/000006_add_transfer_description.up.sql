@@ -1,0 +1,1 @@
+ALTER TABLE "transfers" ADD COLUMN "description" VARCHAR(18) DEFAULT NULL;
