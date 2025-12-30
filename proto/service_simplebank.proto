@@ -13,6 +13,7 @@ import "account.proto";
 import "rpc_create_account.proto";
 import "rpc_list_transactions.proto";
 import "rpc_create_transfer.proto";
+import "rpc_renew_access.proto";
 
 option go_package = "simplebank/pb";
 
@@ -55,13 +56,26 @@ service Simplebank {
 
   rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
     option (google.api.http) = {
-      post: "/v1/users/login"
+      post: "/v1/auth/login"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["User"];
-      summary: "Login user";
-      description: "Use this API to login user";
+      tags: ["Auth"];
+      summary: "Login";
+      description: "Use this API to log in a user";
+    };
+  }
+
+  rpc RenewAccess (RenewAccessRequest) returns (RenewAccessResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/renew"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Auth"];
+      summary: "Renew access";
+      description: "Extend current login session"
     };
   }
 

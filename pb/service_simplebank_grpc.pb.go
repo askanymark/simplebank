@@ -22,6 +22,7 @@ const (
 	Simplebank_CreateUser_FullMethodName       = "/pb.Simplebank/CreateUser"
 	Simplebank_UpdateUser_FullMethodName       = "/pb.Simplebank/UpdateUser"
 	Simplebank_LoginUser_FullMethodName        = "/pb.Simplebank/LoginUser"
+	Simplebank_RenewAccess_FullMethodName      = "/pb.Simplebank/RenewAccess"
 	Simplebank_VerifyEmail_FullMethodName      = "/pb.Simplebank/VerifyEmail"
 	Simplebank_CreateAccount_FullMethodName    = "/pb.Simplebank/CreateAccount"
 	Simplebank_ListTransactions_FullMethodName = "/pb.Simplebank/ListTransactions"
@@ -35,6 +36,7 @@ type SimplebankClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
+	RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error)
 	ListTransactions(ctx context.Context, in *ListTransactionsRequest, opts ...grpc.CallOption) (*ListTransactionsResponse, error)
@@ -73,6 +75,16 @@ func (c *simplebankClient) LoginUser(ctx context.Context, in *LoginUserRequest, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginUserResponse)
 	err := c.cc.Invoke(ctx, Simplebank_LoginUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simplebankClient) RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RenewAccessResponse)
+	err := c.cc.Invoke(ctx, Simplebank_RenewAccess_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +138,7 @@ type SimplebankServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*User, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
+	RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	CreateAccount(context.Context, *CreateAccountRequest) (*Account, error)
 	ListTransactions(context.Context, *ListTransactionsRequest) (*ListTransactionsResponse, error)
@@ -148,6 +161,9 @@ func (UnimplementedSimplebankServer) UpdateUser(context.Context, *UpdateUserRequ
 }
 func (UnimplementedSimplebankServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
+}
+func (UnimplementedSimplebankServer) RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenewAccess not implemented")
 }
 func (UnimplementedSimplebankServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
@@ -232,6 +248,24 @@ func _Simplebank_LoginUser_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SimplebankServer).LoginUser(ctx, req.(*LoginUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Simplebank_RenewAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenewAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimplebankServer).RenewAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Simplebank_RenewAccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimplebankServer).RenewAccess(ctx, req.(*RenewAccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -326,6 +360,10 @@ var Simplebank_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginUser",
 			Handler:    _Simplebank_LoginUser_Handler,
+		},
+		{
+			MethodName: "RenewAccess",
+			Handler:    _Simplebank_RenewAccess_Handler,
 		},
 		{
 			MethodName: "VerifyEmail",
