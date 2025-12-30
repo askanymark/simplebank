@@ -106,7 +106,7 @@ service Simplebank {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["transfers"],
+      tags: ["Transfers"],
       summary: "Create a new transfer",
       description: "Creates a new money transfer from one account to another"
     };

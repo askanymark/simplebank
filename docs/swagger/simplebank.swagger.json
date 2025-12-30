@@ -337,6 +337,10 @@
         "currency": {
           "$ref": "#/definitions/pbCurrency",
           "description": "Type of currency to transfer money in"
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional transfer description"
         }
       },
       "required": [

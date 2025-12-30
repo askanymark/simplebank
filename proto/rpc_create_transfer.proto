@@ -28,7 +28,8 @@ message CreateTransferRequest {
   int64 amount = 3 [
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The amount of money to transfer in the smallest currency"
+      description: "The amount of money to transfer in the smallest currency",
+      minimum: 0
     }
   ];
 
@@ -36,6 +37,13 @@ message CreateTransferRequest {
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Type of currency to transfer money in"
+    }
+  ];
+
+  optional string description = 5 [
+    (google.api.field_behavior) = OPTIONAL,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Optional transfer description"
     }
   ];
 }
