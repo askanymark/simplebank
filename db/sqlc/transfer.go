@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (t Transfer) ToTransaction() *pb.Transfer {
+func (t Transfer) ToResponse() *pb.Transfer {
 	// TODO actual numbers
 	return &pb.Transfer{
 		Id:      t.ID,

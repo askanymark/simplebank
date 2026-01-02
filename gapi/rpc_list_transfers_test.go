@@ -179,7 +179,7 @@ func TestListTransactions(t *testing.T) {
 
 			server := newTestServer(t, store, nil)
 			ctx := tc.buildContext(t, server.tokenMaker)
-			res, err := server.ListTransactions(ctx, tc.req)
+			res, err := server.ListTransfers(ctx, tc.req)
 			tc.checkResponse(t, res, err)
 		})
 	}

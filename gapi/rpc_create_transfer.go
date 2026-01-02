@@ -47,7 +47,7 @@ func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransfer
 	}
 
 	response := &pb.CreateTransferResponse{
-		Transfer:    result.Transfer.ToTransaction(),
+		Transfer:    result.Transfer.ToResponse(),
 		FromAccount: result.FromAccount.ToResponse(),
 		ToAccount:   result.ToAccount.ToResponse(),
 		FromEntry:   result.FromEntry.ToResponse(),
