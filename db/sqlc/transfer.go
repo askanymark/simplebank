@@ -6,9 +6,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (t Transfer) ToTransaction() *pb.Transaction {
+func (t Transfer) ToTransaction() *pb.Transfer {
 	// TODO actual numbers
-	return &pb.Transaction{
+	return &pb.Transfer{
 		Id:      t.ID,
 		Date:    timestamppb.New(t.CreatedAt),
 		Credit:  t.Amount,

@@ -191,7 +191,7 @@ var filter_Simplebank_ListTransactions_0 = &utilities.DoubleArray{Encoding: map[
 
 func request_Simplebank_ListTransactions_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq ListTransactionsRequest
+		protoReq ListTransfersRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -206,7 +206,7 @@ func request_Simplebank_ListTransactions_0(ctx context.Context, marshaler runtim
 
 func local_request_Simplebank_ListTransactions_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq ListTransactionsRequest
+		protoReq ListTransfersRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {

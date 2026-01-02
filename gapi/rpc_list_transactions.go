@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) ListTransactions(ctx context.Context, req *pb.ListTransactionsRequest) (*pb.ListTransactionsResponse, error) {
+func (server *Server) ListTransactions(ctx context.Context, req *pb.ListTransfersRequest) (*pb.ListTransfersResponse, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -47,12 +47,12 @@ func (server *Server) ListTransactions(ctx context.Context, req *pb.ListTransact
 	transfers := findTransfersForAccounts(ctx, server.store, accounts)
 
 	// Convert transfers to responses
-	transactions := make([]*pb.Transaction, len(transfers))
+	transactions := make([]*pb.Transfer, len(transfers))
 	for i, transfer := range transfers {
 		transactions[i] = transfer.ToTransaction()
 	}
 
-	return &pb.ListTransactionsResponse{
+	return &pb.ListTransfersResponse{
 		Pagination: &pb.Pagination{
 			// TODO cursor
 			Count: int64(len(transfers)),
@@ -61,7 +61,7 @@ func (server *Server) ListTransactions(ctx context.Context, req *pb.ListTransact
 	}, nil
 }
 
-func validateListTransactionsRequest(req *pb.ListTransactionsRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateListTransactionsRequest(req *pb.ListTransfersRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if req.Username != nil {
 		if err := val.ValidateUsername(req.GetUsername()); err != nil {
 			violations = append(violations, fieldViolation("username", err))

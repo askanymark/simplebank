@@ -132,7 +132,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pbListTransactionsResponse"
+              "$ref": "#/definitions/pbListTransfersResponse"
             }
           },
           "default": {
@@ -145,7 +145,7 @@
         "parameters": [
           {
             "name": "username",
-            "description": "Bankers can specify username to list transactions for",
+            "description": "Bankers can specify username to list transfers for",
             "in": "query",
             "required": false,
             "type": "string"
@@ -388,7 +388,7 @@
       "type": "object",
       "properties": {
         "transfer": {
-          "$ref": "#/definitions/pbTransaction",
+          "$ref": "#/definitions/pbTransfer",
           "description": "Transfer details"
         },
         "fromAccount": {
@@ -473,7 +473,7 @@
         }
       }
     },
-    "pbListTransactionsResponse": {
+    "pbListTransfersResponse": {
       "type": "object",
       "properties": {
         "pagination": {
@@ -483,7 +483,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/pbTransaction"
+            "$ref": "#/definitions/pbTransfer"
           }
         }
       }
@@ -564,7 +564,7 @@
         }
       }
     },
-    "pbTransaction": {
+    "pbTransfer": {
       "type": "object",
       "properties": {
         "id": {

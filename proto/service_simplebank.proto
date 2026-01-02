@@ -11,7 +11,7 @@ import "rpc_verify_email.proto";
 import "user.proto";
 import "account.proto";
 import "rpc_create_account.proto";
-import "rpc_list_transactions.proto";
+import "rpc_list_transfer.proto";
 import "rpc_create_transfer.proto";
 import "rpc_renew_access.proto";
 
@@ -102,7 +102,7 @@ service Simplebank {
     };
   }
 
-  rpc ListTransactions (ListTransactionsRequest) returns (ListTransactionsResponse) {
+  rpc ListTransactions (ListTransfersRequest) returns (ListTransfersResponse) {
     option (google.api.http) = {
       get: "/v1/transactions"
     };
