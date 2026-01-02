@@ -15,6 +15,7 @@ import "rpc_list_transfer.proto";
 import "rpc_create_transfer.proto";
 import "rpc_renew_access.proto";
 import "rpc_list_accounts.proto";
+import "rpc_get_account.proto";
 
 option go_package = "simplebank/pb";
 
@@ -136,6 +137,18 @@ service Simplebank {
       tags: ["Accounts"]
       summary: "List accounts"
       description: "Lists accounts for user"
+    };
+  }
+
+  rpc GetAccount(GetAccountRequest) returns (Account) {
+    option (google.api.http) = {
+      get: "/v1/accounts/{account_id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Accounts"]
+      summary: "Get account"
+      description: "Returns a user account"
     };
   }
 }

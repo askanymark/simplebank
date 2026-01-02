@@ -28,6 +28,7 @@ const (
 	Simplebank_ListTransactions_FullMethodName = "/pb.Simplebank/ListTransactions"
 	Simplebank_CreateTransfer_FullMethodName   = "/pb.Simplebank/CreateTransfer"
 	Simplebank_ListAccounts_FullMethodName     = "/pb.Simplebank/ListAccounts"
+	Simplebank_GetAccount_FullMethodName       = "/pb.Simplebank/GetAccount"
 )
 
 // SimplebankClient is the client API for Simplebank service.
@@ -43,6 +44,7 @@ type SimplebankClient interface {
 	ListTransactions(ctx context.Context, in *ListTransfersRequest, opts ...grpc.CallOption) (*ListTransfersResponse, error)
 	CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error)
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
+	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error)
 }
 
 type simplebankClient struct {
@@ -143,6 +145,16 @@ func (c *simplebankClient) ListAccounts(ctx context.Context, in *ListAccountsReq
 	return out, nil
 }
 
+func (c *simplebankClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Account)
+	err := c.cc.Invoke(ctx, Simplebank_GetAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SimplebankServer is the server API for Simplebank service.
 // All implementations must embed UnimplementedSimplebankServer
 // for forward compatibility.
@@ -156,6 +168,7 @@ type SimplebankServer interface {
 	ListTransactions(context.Context, *ListTransfersRequest) (*ListTransfersResponse, error)
 	CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error)
 	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
+	GetAccount(context.Context, *GetAccountRequest) (*Account, error)
 	mustEmbedUnimplementedSimplebankServer()
 }
 
@@ -192,6 +205,9 @@ func (UnimplementedSimplebankServer) CreateTransfer(context.Context, *CreateTran
 }
 func (UnimplementedSimplebankServer) ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
+}
+func (UnimplementedSimplebankServer) GetAccount(context.Context, *GetAccountRequest) (*Account, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAccount not implemented")
 }
 func (UnimplementedSimplebankServer) mustEmbedUnimplementedSimplebankServer() {}
 func (UnimplementedSimplebankServer) testEmbeddedByValue()                    {}
@@ -376,6 +392,24 @@ func _Simplebank_ListAccounts_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Simplebank_GetAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimplebankServer).GetAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Simplebank_GetAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimplebankServer).GetAccount(ctx, req.(*GetAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Simplebank_ServiceDesc is the grpc.ServiceDesc for Simplebank service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +452,10 @@ var Simplebank_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAccounts",
 			Handler:    _Simplebank_ListAccounts_Handler,
+		},
+		{
+			MethodName: "GetAccount",
+			Handler:    _Simplebank_GetAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

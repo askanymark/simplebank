@@ -99,6 +99,38 @@
         ]
       }
     },
+    "/v1/accounts/{accountId}": {
+      "get": {
+        "summary": "Get account",
+        "description": "Returns a user account",
+        "operationId": "Simplebank_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbAccount"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
     "/v1/auth/login": {
       "post": {
         "summary": "Login",
