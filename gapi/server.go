@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/token"
@@ -15,7 +14,6 @@ type Server struct {
 	config          util.Config
 	store           db.Store
 	tokenMaker      token.Maker
-	router          *gin.Engine
 	taskDistributor worker.TaskDistributor
 }
 

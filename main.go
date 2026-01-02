@@ -62,7 +62,6 @@ func main() {
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 
 	waitGroup, ctx := errgroup.WithContext(ctx)
-	//runGinServer(err, config, store)
 	runTaskProcessor(ctx, waitGroup, config, redisOpt, store)
 	runGatewayServer(ctx, waitGroup, config, store, taskDistributor)
 	runGrpcServer(ctx, waitGroup, err, config, store, taskDistributor)
