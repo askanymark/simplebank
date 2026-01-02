@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/accounts"
+	"simplebank/pb"
 	"simplebank/util"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) GetAccount(ctx context.Context, req *accounts.GetAccountRequest) (*accounts.Account, error) {
+func (server *Server) GetAccount(ctx context.Context, req *pb.GetAccountRequest) (*pb.Account, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)

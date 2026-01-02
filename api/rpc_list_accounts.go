@@ -4,7 +4,6 @@ import (
 	"context"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
-	"simplebank/pb/accounts"
 	"simplebank/util"
 	"simplebank/val"
 
@@ -13,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) ListAccounts(ctx context.Context, req *accounts.ListAccountsRequest) (*accounts.ListAccountsResponse, error) {
+func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequest) (*pb.ListAccountsResponse, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -44,12 +43,12 @@ func (server *Server) ListAccounts(ctx context.Context, req *accounts.ListAccoun
 		return nil, status.Errorf(codes.Internal, "failed to list accounts: %v", err)
 	}
 
-	response := *accounts.ListAccountsResponse{
+	response := &pb.ListAccountsResponse{
 		Pagination: &pb.Pagination{
 			// TODO cursor
 			Count: int64(len(accounts)),
 		},
-		Data: make([]*accounts.Account, len(accounts)),
+		Data: make([]*pb.Account, len(accounts)),
 	}
 
 	for i, account := range accounts {
@@ -59,7 +58,7 @@ func (server *Server) ListAccounts(ctx context.Context, req *accounts.ListAccoun
 	return response, nil
 }
 
-func validateListAccountsRequest(req *accounts.ListAccountsRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateListAccountsRequest(req *pb.ListAccountsRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if req.Username != nil {
 		if err := val.ValidateUsername(req.GetUsername()); err != nil {
 			violations = append(violations, fieldViolation("username", err))

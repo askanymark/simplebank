@@ -19,7 +19,7 @@ import "accounts/rpc_get_account.proto";
 import "accounts/rpc_delete_account.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/askanymark/simplebank/pb";
+option go_package = "simplebank/pb";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {

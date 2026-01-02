@@ -4,7 +4,7 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/accounts"
+	"simplebank/pb"
 	"simplebank/token"
 	"testing"
 	"time"
@@ -21,14 +21,14 @@ func TestGetAccount(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		req           *accounts.GetAccountRequest
+		req           *pb.GetAccountRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, res *accounts.Account, err error)
+		checkResponse func(t *testing.T, res *pb.Account, err error)
 	}{
 		{
 			"OK",
-			&accounts.GetAccountRequest{
+			&pb.GetAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -40,7 +40,7 @@ func TestGetAccount(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *accounts.Account, err error) {
+			func(t *testing.T, res *pb.Account, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Equal(t, account.ID, res.Id)
@@ -49,7 +49,7 @@ func TestGetAccount(t *testing.T) {
 		},
 		{
 			"NotFound",
-			&accounts.GetAccountRequest{
+			&pb.GetAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -61,7 +61,7 @@ func TestGetAccount(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *accounts.Account, err error) {
+			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -70,7 +70,7 @@ func TestGetAccount(t *testing.T) {
 		},
 		{
 			"InternalError",
-			&accounts.GetAccountRequest{
+			&pb.GetAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -82,7 +82,7 @@ func TestGetAccount(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *accounts.Account, err error) {
+			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -91,7 +91,7 @@ func TestGetAccount(t *testing.T) {
 		},
 		{
 			"PermissionDenied",
-			&accounts.GetAccountRequest{
+			&pb.GetAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -106,7 +106,7 @@ func TestGetAccount(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *accounts.Account, err error) {
+			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -115,7 +115,7 @@ func TestGetAccount(t *testing.T) {
 		},
 		{
 			"Unauthorized",
-			&accounts.GetAccountRequest{
+			&pb.GetAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -126,7 +126,7 @@ func TestGetAccount(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			func(t *testing.T, res *accounts.Account, err error) {
+			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)

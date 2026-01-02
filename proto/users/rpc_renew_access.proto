@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "simplebank/pb/users";
+option go_package = "simplebank/pb";
 
 import "google/protobuf/timestamp.proto";
 import "google/api/field_behavior.proto";

@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/accounts"
+	"simplebank/pb"
 	"simplebank/util"
 	"simplebank/val"
 
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateAccount(ctx context.Context, req *accounts.CreateAccountRequest) (*accounts.Account, error) {
+func (server *Server) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.Account, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -37,7 +37,7 @@ func (server *Server) CreateAccount(ctx context.Context, req *accounts.CreateAcc
 	return account.ToResponse(), nil
 }
 
-func validateCreateAccountRequest(req *accounts.CreateAccountRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateCreateAccountRequest(req *pb.CreateAccountRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateCurrency(req.GetCurrency().String()); err != nil {
 		violations = append(violations, fieldViolation("currency", err))
 	}

@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/users"
+	"simplebank/pb"
 	"simplebank/val"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) VerifyEmail(ctx context.Context, req *users.VerifyEmailRequest) (*users.VerifyEmailResponse, error) {
+func (server *Server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailRequest) (*pb.VerifyEmailResponse, error) {
 	violations := validateVerifyEmailRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
@@ -25,13 +25,13 @@ func (server *Server) VerifyEmail(ctx context.Context, req *users.VerifyEmailReq
 		return nil, status.Errorf(codes.Internal, "failed to verify email")
 	}
 
-	response := &users.VerifyEmailResponse{
+	response := &pb.VerifyEmailResponse{
 		IsVerified: txResult.User.IsEmailVerified,
 	}
 	return response, nil
 }
 
-func validateVerifyEmailRequest(req *users.VerifyEmailRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateVerifyEmailRequest(req *pb.VerifyEmailRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateEmailId(req.GetEmailId()); err != nil {
 		violations = append(violations, fieldViolation("email_id", err))
 	}

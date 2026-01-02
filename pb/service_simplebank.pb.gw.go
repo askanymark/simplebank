@@ -13,9 +13,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"simplebank/pb/accounts"
-	"simplebank/pb/transfers"
-	"simplebank/pb/users"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
@@ -40,7 +37,7 @@ var (
 
 func request_Simplebank_CreateUser_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.CreateUserRequest
+		protoReq CreateUserRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -52,7 +49,7 @@ func request_Simplebank_CreateUser_0(ctx context.Context, marshaler runtime.Mars
 
 func local_request_Simplebank_CreateUser_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.CreateUserRequest
+		protoReq CreateUserRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -64,7 +61,7 @@ func local_request_Simplebank_CreateUser_0(ctx context.Context, marshaler runtim
 
 func request_Simplebank_UpdateUser_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.UpdateUserRequest
+		protoReq UpdateUserRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -76,7 +73,7 @@ func request_Simplebank_UpdateUser_0(ctx context.Context, marshaler runtime.Mars
 
 func local_request_Simplebank_UpdateUser_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.UpdateUserRequest
+		protoReq UpdateUserRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -88,7 +85,7 @@ func local_request_Simplebank_UpdateUser_0(ctx context.Context, marshaler runtim
 
 func request_Simplebank_LoginUser_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.LoginUserRequest
+		protoReq LoginUserRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -100,7 +97,7 @@ func request_Simplebank_LoginUser_0(ctx context.Context, marshaler runtime.Marsh
 
 func local_request_Simplebank_LoginUser_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.LoginUserRequest
+		protoReq LoginUserRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -112,7 +109,7 @@ func local_request_Simplebank_LoginUser_0(ctx context.Context, marshaler runtime
 
 func request_Simplebank_RenewAccess_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.RenewAccessRequest
+		protoReq RenewAccessRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -124,7 +121,7 @@ func request_Simplebank_RenewAccess_0(ctx context.Context, marshaler runtime.Mar
 
 func local_request_Simplebank_RenewAccess_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.RenewAccessRequest
+		protoReq RenewAccessRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -138,7 +135,7 @@ var filter_Simplebank_VerifyEmail_0 = &utilities.DoubleArray{Encoding: map[strin
 
 func request_Simplebank_VerifyEmail_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.VerifyEmailRequest
+		protoReq VerifyEmailRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -153,7 +150,7 @@ func request_Simplebank_VerifyEmail_0(ctx context.Context, marshaler runtime.Mar
 
 func local_request_Simplebank_VerifyEmail_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq users.VerifyEmailRequest
+		protoReq VerifyEmailRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -168,7 +165,7 @@ func local_request_Simplebank_VerifyEmail_0(ctx context.Context, marshaler runti
 
 func request_Simplebank_CreateAccount_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.CreateAccountRequest
+		protoReq CreateAccountRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -180,7 +177,7 @@ func request_Simplebank_CreateAccount_0(ctx context.Context, marshaler runtime.M
 
 func local_request_Simplebank_CreateAccount_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.CreateAccountRequest
+		protoReq CreateAccountRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -194,7 +191,7 @@ var filter_Simplebank_ListTransfers_0 = &utilities.DoubleArray{Encoding: map[str
 
 func request_Simplebank_ListTransfers_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq transfers.ListTransfersRequest
+		protoReq ListTransfersRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -209,7 +206,7 @@ func request_Simplebank_ListTransfers_0(ctx context.Context, marshaler runtime.M
 
 func local_request_Simplebank_ListTransfers_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq transfers.ListTransfersRequest
+		protoReq ListTransfersRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -224,7 +221,7 @@ func local_request_Simplebank_ListTransfers_0(ctx context.Context, marshaler run
 
 func request_Simplebank_CreateTransfer_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq transfers.CreateTransferRequest
+		protoReq CreateTransferRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -236,7 +233,7 @@ func request_Simplebank_CreateTransfer_0(ctx context.Context, marshaler runtime.
 
 func local_request_Simplebank_CreateTransfer_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq transfers.CreateTransferRequest
+		protoReq CreateTransferRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -250,7 +247,7 @@ var filter_Simplebank_ListAccounts_0 = &utilities.DoubleArray{Encoding: map[stri
 
 func request_Simplebank_ListAccounts_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.ListAccountsRequest
+		protoReq ListAccountsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -265,7 +262,7 @@ func request_Simplebank_ListAccounts_0(ctx context.Context, marshaler runtime.Ma
 
 func local_request_Simplebank_ListAccounts_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.ListAccountsRequest
+		protoReq ListAccountsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -280,7 +277,7 @@ func local_request_Simplebank_ListAccounts_0(ctx context.Context, marshaler runt
 
 func request_Simplebank_GetAccount_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.GetAccountRequest
+		protoReq GetAccountRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -298,7 +295,7 @@ func request_Simplebank_GetAccount_0(ctx context.Context, marshaler runtime.Mars
 
 func local_request_Simplebank_GetAccount_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.GetAccountRequest
+		protoReq GetAccountRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -316,7 +313,7 @@ func local_request_Simplebank_GetAccount_0(ctx context.Context, marshaler runtim
 
 func request_Simplebank_DeleteAccount_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.DeleteAccountRequest
+		protoReq DeleteAccountRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -334,7 +331,7 @@ func request_Simplebank_DeleteAccount_0(ctx context.Context, marshaler runtime.M
 
 func local_request_Simplebank_DeleteAccount_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq accounts.DeleteAccountRequest
+		protoReq DeleteAccountRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)

@@ -4,7 +4,7 @@
 // 	protoc        v6.33.2
 // source: transfers/rpc_create_transfer.proto
 
-package transfers
+package pb
 
 import (
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	accounts "simplebank/pb/accounts"
 	sync "sync"
 )
 
@@ -28,7 +27,7 @@ type CreateTransferRequest struct {
 	FromAccountId int64                  `protobuf:"varint,1,opt,name=from_account_id,json=fromAccountId,proto3" json:"from_account_id,omitempty"`
 	ToAccountId   int64                  `protobuf:"varint,2,opt,name=to_account_id,json=toAccountId,proto3" json:"to_account_id,omitempty"`
 	Amount        int64                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	Currency      accounts.Currency      `protobuf:"varint,4,opt,name=currency,proto3,enum=pb.Currency" json:"currency,omitempty"`
+	Currency      Currency               `protobuf:"varint,4,opt,name=currency,proto3,enum=pb.Currency" json:"currency,omitempty"`
 	Description   *string                `protobuf:"bytes,5,opt,name=description,proto3,oneof" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -85,11 +84,11 @@ func (x *CreateTransferRequest) GetAmount() int64 {
 	return 0
 }
 
-func (x *CreateTransferRequest) GetCurrency() accounts.Currency {
+func (x *CreateTransferRequest) GetCurrency() Currency {
 	if x != nil {
 		return x.Currency
 	}
-	return accounts.Currency(0)
+	return Currency_USD
 }
 
 func (x *CreateTransferRequest) GetDescription() string {
@@ -102,8 +101,8 @@ func (x *CreateTransferRequest) GetDescription() string {
 type CreateTransferResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Transfer      *Transfer              `protobuf:"bytes,1,opt,name=transfer,proto3" json:"transfer,omitempty"`
-	FromAccount   *accounts.Account      `protobuf:"bytes,2,opt,name=from_account,json=fromAccount,proto3" json:"from_account,omitempty"`
-	ToAccount     *accounts.Account      `protobuf:"bytes,3,opt,name=to_account,json=toAccount,proto3" json:"to_account,omitempty"`
+	FromAccount   *Account               `protobuf:"bytes,2,opt,name=from_account,json=fromAccount,proto3" json:"from_account,omitempty"`
+	ToAccount     *Account               `protobuf:"bytes,3,opt,name=to_account,json=toAccount,proto3" json:"to_account,omitempty"`
 	FromEntry     *Entry                 `protobuf:"bytes,4,opt,name=from_entry,json=fromEntry,proto3" json:"from_entry,omitempty"`
 	ToEntry       *Entry                 `protobuf:"bytes,5,opt,name=to_entry,json=toEntry,proto3" json:"to_entry,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -147,14 +146,14 @@ func (x *CreateTransferResponse) GetTransfer() *Transfer {
 	return nil
 }
 
-func (x *CreateTransferResponse) GetFromAccount() *accounts.Account {
+func (x *CreateTransferResponse) GetFromAccount() *Account {
 	if x != nil {
 		return x.FromAccount
 	}
 	return nil
 }
 
-func (x *CreateTransferResponse) GetToAccount() *accounts.Account {
+func (x *CreateTransferResponse) GetToAccount() *Account {
 	if x != nil {
 		return x.ToAccount
 	}
@@ -244,10 +243,9 @@ var file_transfers_rpc_create_transfer_proto_rawDesc = []byte{
 	0x09, 0x2e, 0x70, 0x62, 0x2e, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x42, 0x29, 0x92, 0x41, 0x26, 0x32,
 	0x24, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x20, 0x6d, 0x61, 0x64, 0x65, 0x20, 0x61, 0x67, 0x61,
 	0x69, 0x6e, 0x73, 0x74, 0x20, 0x72, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x72, 0x20, 0x61, 0x63,
-	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x07, 0x74, 0x6f, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x42, 0x19,
-	0x5a, 0x17, 0x73, 0x69, 0x6d, 0x70, 0x6c, 0x65, 0x62, 0x61, 0x6e, 0x6b, 0x2f, 0x70, 0x62, 0x2f,
-	0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x07, 0x74, 0x6f, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x42, 0x0f,
+	0x5a, 0x0d, 0x73, 0x69, 0x6d, 0x70, 0x6c, 0x65, 0x62, 0x61, 0x6e, 0x6b, 0x2f, 0x70, 0x62, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -266,9 +264,9 @@ var file_transfers_rpc_create_transfer_proto_msgTypes = make([]protoimpl.Message
 var file_transfers_rpc_create_transfer_proto_goTypes = []any{
 	(*CreateTransferRequest)(nil),  // 0: pb.CreateTransferRequest
 	(*CreateTransferResponse)(nil), // 1: pb.CreateTransferResponse
-	(accounts.Currency)(0),         // 2: pb.Currency
+	(Currency)(0),                  // 2: pb.Currency
 	(*Transfer)(nil),               // 3: pb.Transfer
-	(*accounts.Account)(nil),       // 4: pb.Account
+	(*Account)(nil),                // 4: pb.Account
 	(*Entry)(nil),                  // 5: pb.Entry
 }
 var file_transfers_rpc_create_transfer_proto_depIdxs = []int32{
@@ -290,6 +288,7 @@ func file_transfers_rpc_create_transfer_proto_init() {
 	if File_transfers_rpc_create_transfer_proto != nil {
 		return
 	}
+	file_accounts_account_proto_init()
 	file_transfers_transfer_proto_init()
 	file_transfers_entry_proto_init()
 	file_transfers_rpc_create_transfer_proto_msgTypes[0].OneofWrappers = []any{}

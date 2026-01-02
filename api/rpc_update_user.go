@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/users"
+	"simplebank/pb"
 	"simplebank/util"
 	"simplebank/val"
 	"time"
@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) UpdateUser(ctx context.Context, req *users.UpdateUserRequest) (*users.User, error) {
+func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -74,7 +74,7 @@ func (server *Server) UpdateUser(ctx context.Context, req *users.UpdateUserReque
 	return user.ToResponse(), nil
 }
 
-func validateUpdateUserRequest(req *users.UpdateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}

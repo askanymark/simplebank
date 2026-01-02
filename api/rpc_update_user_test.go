@@ -4,7 +4,7 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/users"
+	"simplebank/pb"
 	"simplebank/token"
 	"simplebank/util"
 	"testing"
@@ -23,14 +23,14 @@ func TestUpdateUserAPI(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		req           *users.UpdateUserRequest
+		req           *pb.UpdateUserRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, resp *users.User, err error)
+		checkResponse func(t *testing.T, resp *pb.User, err error)
 	}{
 		{
 			"OK",
-			&users.UpdateUserRequest{
+			&pb.UpdateUserRequest{
 				Username: user.Username,
 				FullName: &newName,
 				Email:    &newEmail,
@@ -63,7 +63,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *users.User, err error) {
+			func(t *testing.T, res *pb.User, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Equal(t, user.Username, res.Username)

@@ -4,8 +4,7 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/accounts"
-	"simplebank/pb/transfers"
+	"simplebank/pb"
 	"simplebank/token"
 	"simplebank/util"
 	"testing"
@@ -29,18 +28,18 @@ func TestCreateTransfer(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		req           *transfers.CreateTransferRequest
+		req           *pb.CreateTransferRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, res *transfers.CreateTransferResponse, err error)
+		checkResponse func(t *testing.T, res *pb.CreateTransferResponse, err error)
 	}{
 		{
 			"OK",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -73,18 +72,18 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 			},
 		},
 		{
 			"Unauthorized",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -98,7 +97,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -107,11 +106,11 @@ func TestCreateTransfer(t *testing.T) {
 		},
 		{
 			"FromAccountNotFound",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -130,7 +129,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -139,11 +138,11 @@ func TestCreateTransfer(t *testing.T) {
 		},
 		{
 			"ToAccountNotFound",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -163,7 +162,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -172,11 +171,11 @@ func TestCreateTransfer(t *testing.T) {
 		},
 		{
 			"FromAccountCurrencyMismatch",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_EUR,
+				Currency:      pb.Currency_EUR,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -195,7 +194,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -204,11 +203,11 @@ func TestCreateTransfer(t *testing.T) {
 		},
 		{
 			"ToAccountCurrencyMismatch",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -230,7 +229,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -239,11 +238,11 @@ func TestCreateTransfer(t *testing.T) {
 		},
 		{
 			"PermissionDenied",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				otherAccount := account1
@@ -264,7 +263,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -273,11 +272,11 @@ func TestCreateTransfer(t *testing.T) {
 		},
 		{
 			"InternalErrorTransferTx",
-			&transfers.CreateTransferRequest{
+			&pb.CreateTransferRequest{
 				FromAccountId: account1.ID,
 				ToAccountId:   account2.ID,
 				Amount:        amount,
-				Currency:      accounts.Currency_USD,
+				Currency:      pb.Currency_USD,
 			},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -298,7 +297,7 @@ func TestCreateTransfer(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *transfers.CreateTransferResponse, err error) {
+			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)

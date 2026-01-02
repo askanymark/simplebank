@@ -46,12 +46,9 @@ proto:
 	rm -f docs/swagger/*.swagger.json
 	protoc \
 		--proto_path=proto \
-		--go_out=pb \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=pb \
-		--go-grpc_opt=paths=source_relative \
-		--grpc-gateway_out=pb \
-		--grpc-gateway_opt=paths=source_relative \
+		--go_out=pb --go_opt=paths=source_relative \
+		--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
 		--openapiv2_out=docs/swagger \
 		--openapiv2_opt=allow_merge=true,merge_file_name=simplebank \
 		--experimental_allow_proto3_optional \
@@ -59,6 +56,10 @@ proto:
 		proto/accounts/*.proto \
 		proto/users/*.proto \
 		proto/transfers/*.proto
+	mv pb/accounts/*.go pb/ 2>/dev/null || true
+	mv pb/users/*.go pb/ 2>/dev/null || true
+	mv pb/transfers/*.go pb/ 2>/dev/null || true
+	rm -rf pb/accounts pb/users pb/transfers
 	statik -src=./docs/swagger -dest=./docs
 
 .PHONY: postgres createdb migrateup sqlc mock proto redis

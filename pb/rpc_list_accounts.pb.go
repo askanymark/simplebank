@@ -4,7 +4,7 @@
 // 	protoc        v6.33.2
 // source: accounts/rpc_list_accounts.proto
 
-package accounts
+package pb
 
 import (
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	pb "simplebank/pb"
 	sync "sync"
 )
 
@@ -85,7 +84,7 @@ func (x *ListAccountsRequest) GetLimit() int64 {
 
 type ListAccountsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Pagination    *pb.Pagination         `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination    *Pagination            `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	Data          []*Account             `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -121,7 +120,7 @@ func (*ListAccountsResponse) Descriptor() ([]byte, []int) {
 	return file_accounts_rpc_list_accounts_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ListAccountsResponse) GetPagination() *pb.Pagination {
+func (x *ListAccountsResponse) GetPagination() *Pagination {
 	if x != nil {
 		return x.Pagination
 	}
@@ -165,9 +164,9 @@ var file_accounts_rpc_list_accounts_proto_rawDesc = []byte{
 	0x62, 0x2e, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0a, 0x70, 0x61,
 	0x67, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
 	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x70, 0x62, 0x2e, 0x41, 0x63, 0x63, 0x6f,
-	0x75, 0x6e, 0x74, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x42, 0x18, 0x5a, 0x16, 0x73, 0x69, 0x6d,
-	0x70, 0x6c, 0x65, 0x62, 0x61, 0x6e, 0x6b, 0x2f, 0x70, 0x62, 0x2f, 0x61, 0x63, 0x63, 0x6f, 0x75,
-	0x6e, 0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x6e, 0x74, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x42, 0x0f, 0x5a, 0x0d, 0x73, 0x69, 0x6d,
+	0x70, 0x6c, 0x65, 0x62, 0x61, 0x6e, 0x6b, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -186,7 +185,7 @@ var file_accounts_rpc_list_accounts_proto_msgTypes = make([]protoimpl.MessageInf
 var file_accounts_rpc_list_accounts_proto_goTypes = []any{
 	(*ListAccountsRequest)(nil),  // 0: pb.ListAccountsRequest
 	(*ListAccountsResponse)(nil), // 1: pb.ListAccountsResponse
-	(*pb.Pagination)(nil),        // 2: pb.Pagination
+	(*Pagination)(nil),           // 2: pb.Pagination
 	(*Account)(nil),              // 3: pb.Account
 }
 var file_accounts_rpc_list_accounts_proto_depIdxs = []int32{
@@ -204,6 +203,7 @@ func file_accounts_rpc_list_accounts_proto_init() {
 	if File_accounts_rpc_list_accounts_proto != nil {
 		return
 	}
+	file_pagination_proto_init()
 	file_accounts_account_proto_init()
 	file_accounts_rpc_list_accounts_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}

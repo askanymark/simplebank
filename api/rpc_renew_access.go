@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	db "simplebank/db/sqlc"
-	"simplebank/pb/users"
+	"simplebank/pb"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (server *Server) RenewAccess(ctx context.Context, req *users.RenewAccessRequest) (*users.RenewAccessResponse, error) {
+func (server *Server) RenewAccess(ctx context.Context, req *pb.RenewAccessRequest) (*pb.RenewAccessResponse, error) {
 	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -48,7 +48,7 @@ func (server *Server) RenewAccess(ctx context.Context, req *users.RenewAccessReq
 		return nil, status.Errorf(codes.Internal, "cannot create access token: %v", err)
 	}
 
-	response := &users.RenewAccessResponse{
+	response := &pb.RenewAccessResponse{
 		AccessToken:          accessToken,
 		AccessTokenExpiresAt: timestamppb.New(accessPayload.ExpiredAt),
 	}
