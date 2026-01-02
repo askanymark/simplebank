@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"simplebank/api"
 	db "simplebank/db/sqlc"
 	_ "simplebank/docs/statik"
-	"simplebank/gapi"
 	"simplebank/mail"
 	"simplebank/pb"
 	"simplebank/util"
@@ -95,12 +95,12 @@ func runTaskProcessor(ctx context.Context, waitGroup *errgroup.Group, config uti
 }
 
 func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, err error, config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
-	server, err := gapi.NewServer(config, store, taskDistributor)
+	server, err := api.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
 
-	grpcLogger := grpc.UnaryInterceptor(gapi.GrpcLogger)
+	grpcLogger := grpc.UnaryInterceptor(api.GrpcLogger)
 	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterSimplebankServer(grpcServer, server)
 	reflection.Register(grpcServer)
@@ -138,7 +138,7 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, err error, co
 }
 
 func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
-	server, err := gapi.NewServer(config, store, taskDistributor)
+	server, err := api.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
@@ -175,7 +175,7 @@ func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config uti
 		AllowedOrigins: []string{"http://localhost:3000", "https://simplebank.askanymark.io"},
 		AllowedMethods: []string{"GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"},
 	})
-	handler := c.Handler(gapi.HttpLogger(mux))
+	handler := c.Handler(api.HttpLogger(mux))
 	httpServer := &http.Server{
 		Handler: handler,
 		Addr:    config.HTTPServerAddress,
