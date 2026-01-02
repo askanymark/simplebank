@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -29,6 +30,7 @@ const (
 	Simplebank_CreateTransfer_FullMethodName = "/pb.Simplebank/CreateTransfer"
 	Simplebank_ListAccounts_FullMethodName   = "/pb.Simplebank/ListAccounts"
 	Simplebank_GetAccount_FullMethodName     = "/pb.Simplebank/GetAccount"
+	Simplebank_DeleteAccount_FullMethodName  = "/pb.Simplebank/DeleteAccount"
 )
 
 // SimplebankClient is the client API for Simplebank service.
@@ -45,6 +47,7 @@ type SimplebankClient interface {
 	CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error)
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error)
+	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type simplebankClient struct {
@@ -155,6 +158,16 @@ func (c *simplebankClient) GetAccount(ctx context.Context, in *GetAccountRequest
 	return out, nil
 }
 
+func (c *simplebankClient) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Simplebank_DeleteAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SimplebankServer is the server API for Simplebank service.
 // All implementations must embed UnimplementedSimplebankServer
 // for forward compatibility.
@@ -169,6 +182,7 @@ type SimplebankServer interface {
 	CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error)
 	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*Account, error)
+	DeleteAccount(context.Context, *DeleteAccountRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedSimplebankServer()
 }
 
@@ -208,6 +222,9 @@ func (UnimplementedSimplebankServer) ListAccounts(context.Context, *ListAccounts
 }
 func (UnimplementedSimplebankServer) GetAccount(context.Context, *GetAccountRequest) (*Account, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccount not implemented")
+}
+func (UnimplementedSimplebankServer) DeleteAccount(context.Context, *DeleteAccountRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
 }
 func (UnimplementedSimplebankServer) mustEmbedUnimplementedSimplebankServer() {}
 func (UnimplementedSimplebankServer) testEmbeddedByValue()                    {}
@@ -410,6 +427,24 @@ func _Simplebank_GetAccount_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Simplebank_DeleteAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimplebankServer).DeleteAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Simplebank_DeleteAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimplebankServer).DeleteAccount(ctx, req.(*DeleteAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Simplebank_ServiceDesc is the grpc.ServiceDesc for Simplebank service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -456,6 +491,10 @@ var Simplebank_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccount",
 			Handler:    _Simplebank_GetAccount_Handler,
+		},
+		{
+			MethodName: "DeleteAccount",
+			Handler:    _Simplebank_DeleteAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "simplebank/pb";
+
+import "google/api/field_behavior.proto";
+
+message DeleteAccountRequest {
+  int64 account_id = 1 [
+    (google.api.field_behavior) = REQUIRED
+  ];
+}

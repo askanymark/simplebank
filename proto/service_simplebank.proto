@@ -16,6 +16,8 @@ import "rpc_create_transfer.proto";
 import "rpc_renew_access.proto";
 import "rpc_list_accounts.proto";
 import "rpc_get_account.proto";
+import "rpc_delete_account.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "simplebank/pb";
 
@@ -149,6 +151,18 @@ service Simplebank {
       tags: ["Accounts"]
       summary: "Get account"
       description: "Returns a user account"
+    };
+  }
+
+  rpc DeleteAccount(DeleteAccountRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/accounts/{account_id}"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Accounts"]
+      summary: "Delete account"
+      description: "Deletes a user account"
     };
   }
 }

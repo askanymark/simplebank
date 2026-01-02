@@ -1,0 +1,1 @@
+delete from accounts where id = 298;
