@@ -4,7 +4,7 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/accounts"
 	"simplebank/token"
 	"testing"
 	"time"
@@ -15,19 +15,19 @@ import (
 
 func TestServer_CreateAccount(t *testing.T) {
 	user, _ := randomUser(t)
-	expectedCurrency := pb.Currency_GBP
+	expectedCurrency := accounts.Currency_GBP
 	currencyPtr := expectedCurrency.Enum()
 
 	testCases := []struct {
 		name          string
-		body          *pb.CreateAccountRequest
+		body          *accounts.CreateAccountRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, res *pb.Account, err error)
+		checkResponse func(t *testing.T, res *accounts.Account, err error)
 	}{
 		{
 			"Created",
-			&pb.CreateAccountRequest{
+			&accounts.CreateAccountRequest{
 				Currency: expectedCurrency,
 			},
 			func(store *mockdb.MockStore) {
@@ -53,7 +53,7 @@ func TestServer_CreateAccount(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.Account, err error) {
+			func(t *testing.T, res *accounts.Account, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Equal(t, user.FullName, res.Owner)

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/users"
 	"simplebank/util"
 	"simplebank/worker"
 	mockwk "simplebank/worker/mock"
@@ -76,13 +76,13 @@ func TestCreateUser(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		body          *pb.CreateUserRequest
+		body          *users.CreateUserRequest
 		buildStubs    func(store *mockdb.MockStore, distributor *mockwk.MockTaskDistributor)
-		checkResponse func(t *testing.T, res *pb.User, err error)
+		checkResponse func(t *testing.T, res *users.User, err error)
 	}{
 		{
 			"Created",
-			&pb.CreateUserRequest{
+			&users.CreateUserRequest{
 				Username: user.Username,
 				Password: password,
 				FullName: user.FullName,
@@ -110,7 +110,7 @@ func TestCreateUser(t *testing.T) {
 					Times(1).
 					Return(nil)
 			},
-			func(t *testing.T, res *pb.User, err error) {
+			func(t *testing.T, res *users.User, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Equal(t, user.Username, res.Username)

@@ -39,7 +39,10 @@ mock:
 	mockgen -package mockwk -destination worker/mock/distributor.go simplebank/worker TaskDistributor
 
 proto:
-	rm -f pb/*.go
+	rm -rf pb/*.go
+	rm -rf pb/accounts/*.go
+	rm -rf pb/users/*.go
+	rm -rf pb/transfers/*.go
 	rm -f docs/swagger/*.swagger.json
 	protoc \
 		--proto_path=proto \
@@ -52,7 +55,10 @@ proto:
 		--openapiv2_out=docs/swagger \
 		--openapiv2_opt=allow_merge=true,merge_file_name=simplebank \
 		--experimental_allow_proto3_optional \
-		proto/*.proto
+		proto/*.proto \
+		proto/accounts/*.proto \
+		proto/users/*.proto \
+		proto/transfers/*.proto
 	statik -src=./docs/swagger -dest=./docs
 
 .PHONY: postgres createdb migrateup sqlc mock proto redis

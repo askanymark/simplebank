@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/users"
 	"simplebank/util"
 	"simplebank/val"
 
@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
+func (server *Server) LoginUser(ctx context.Context, req *users.LoginUserRequest) (*users.LoginUserResponse, error) {
 	violations := validateLoginUserRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
@@ -62,7 +62,7 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.Internal, "cannot create session: %v", err)
 	}
 
-	response := &pb.LoginUserResponse{
+	response := &users.LoginUserResponse{
 		SessionId:             session.ID.String(),
 		AccessToken:           accessToken,
 		AccessTokenExpiresAt:  timestamppb.New(accessPayload.ExpiredAt),
@@ -73,7 +73,7 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 	return response, nil
 }
 
-func validateLoginUserRequest(req *pb.LoginUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateLoginUserRequest(req *users.LoginUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}

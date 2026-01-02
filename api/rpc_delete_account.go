@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/accounts"
 	"simplebank/util"
 
 	"google.golang.org/grpc/codes"
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (server *Server) DeleteAccount(ctx context.Context, req *pb.DeleteAccountRequest) (*emptypb.Empty, error) {
+func (server *Server) DeleteAccount(ctx context.Context, req *accounts.DeleteAccountRequest) (*emptypb.Empty, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)

@@ -4,7 +4,7 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/transfers"
 	"simplebank/token"
 	"simplebank/util"
 	"testing"
@@ -32,14 +32,14 @@ func TestListTransactions(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		req           *pb.ListTransfersRequest
+		req           *transfers.ListTransfersRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, res *pb.ListTransfersResponse, err error)
+		checkResponse func(t *testing.T, res *transfers.ListTransfersResponse, err error)
 	}{
 		{
 			"OK",
-			&pb.ListTransfersRequest{},
+			&transfers.ListTransfersRequest{},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
 					ListAccounts(gomock.Any(), gomock.Eq(db.ListAccountsParams{
@@ -73,7 +73,7 @@ func TestListTransactions(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
+			func(t *testing.T, res *transfers.ListTransfersResponse, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Len(t, res.Data, 4)
@@ -81,7 +81,7 @@ func TestListTransactions(t *testing.T) {
 		},
 		{
 			"BankerListOtherUser",
-			&pb.ListTransfersRequest{
+			&transfers.ListTransfersRequest{
 				Username: &otherUser.Username,
 			},
 			func(store *mockdb.MockStore) {
@@ -104,7 +104,7 @@ func TestListTransactions(t *testing.T) {
 				// But wait, ListTransactions only allows DepositorRole in authorizeUser!
 				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
+			func(t *testing.T, res *transfers.ListTransfersResponse, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Len(t, res.Data, 1)
@@ -112,7 +112,7 @@ func TestListTransactions(t *testing.T) {
 		},
 		{
 			"PermissionDenied",
-			&pb.ListTransfersRequest{
+			&transfers.ListTransfersRequest{
 				Username: &otherUser.Username,
 			},
 			func(store *mockdb.MockStore) {
@@ -123,7 +123,7 @@ func TestListTransactions(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
+			func(t *testing.T, res *transfers.ListTransfersResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -132,7 +132,7 @@ func TestListTransactions(t *testing.T) {
 		},
 		{
 			"Unauthenticated",
-			&pb.ListTransfersRequest{},
+			&transfers.ListTransfersRequest{},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
 					ListAccounts(gomock.Any(), gomock.Any()).
@@ -141,7 +141,7 @@ func TestListTransactions(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
+			func(t *testing.T, res *transfers.ListTransfersResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -150,7 +150,7 @@ func TestListTransactions(t *testing.T) {
 		},
 		{
 			"InternalError",
-			&pb.ListTransfersRequest{},
+			&transfers.ListTransfersRequest{},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
 					ListAccounts(gomock.Any(), gomock.Any()).
@@ -160,7 +160,7 @@ func TestListTransactions(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
+			func(t *testing.T, res *transfers.ListTransfersResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)

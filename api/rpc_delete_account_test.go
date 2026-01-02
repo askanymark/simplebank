@@ -4,7 +4,7 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/accounts"
 	"simplebank/token"
 	"simplebank/util"
 	"testing"
@@ -26,14 +26,14 @@ func TestDeleteAccount(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		req           *pb.DeleteAccountRequest
+		req           *accounts.DeleteAccountRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, err error)
 	}{
 		{
 			"OK",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -55,7 +55,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"OKBanker",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -77,7 +77,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"NotFound",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -101,7 +101,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"InternalErrorOnGet",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -125,7 +125,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"PermissionDenied",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -152,7 +152,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"InternalErrorOnDelete",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -177,7 +177,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"ForeignKeyViolation",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
@@ -202,7 +202,7 @@ func TestDeleteAccount(t *testing.T) {
 		},
 		{
 			"Unauthorized",
-			&pb.DeleteAccountRequest{
+			&accounts.DeleteAccountRequest{
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {

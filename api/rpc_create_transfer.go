@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/transfers"
 	"simplebank/util"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransferRequest) (*pb.CreateTransferResponse, error) {
+func (server *Server) CreateTransfer(ctx context.Context, req *transfers.CreateTransferRequest) (*transfers.CreateTransferResponse, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -46,7 +46,7 @@ func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransfer
 		return nil, status.Errorf(codes.Internal, "failed to create transfer: %v", err)
 	}
 
-	response := &pb.CreateTransferResponse{
+	response := &transfers.CreateTransferResponse{
 		Transfer:    result.Transfer.ToResponse(),
 		FromAccount: result.FromAccount.ToResponse(),
 		ToAccount:   result.ToAccount.ToResponse(),

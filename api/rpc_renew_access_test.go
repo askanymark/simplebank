@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"simplebank/pb/users"
 	"testing"
 	"time"
 
@@ -14,7 +15,6 @@ import (
 
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
 	"simplebank/util"
 	mockwk "simplebank/worker/mock"
 )
@@ -28,7 +28,7 @@ func TestRenewAccess(t *testing.T) {
 	testCases := []struct {
 		name          string
 		buildStubs    func(store *mockdb.MockStore, server *Server) (string, time.Time)
-		checkResponse func(t *testing.T, res *pb.RenewAccessResponse, err error)
+		checkResponse func(t *testing.T, res *users.RenewAccessResponse, err error)
 	}{
 		{
 			"OK",
@@ -54,7 +54,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.NotEmpty(t, res.AccessToken)
@@ -66,7 +66,7 @@ func TestRenewAccess(t *testing.T) {
 			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
 				return "invalid-token", time.Time{}
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.Unauthenticated, st.Code())
@@ -85,7 +85,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.NotFound, st.Code())
@@ -115,7 +115,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.PermissionDenied, st.Code())
@@ -145,7 +145,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.PermissionDenied, st.Code())
@@ -175,7 +175,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.PermissionDenied, st.Code())
@@ -205,7 +205,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.PermissionDenied, st.Code())
@@ -224,7 +224,7 @@ func TestRenewAccess(t *testing.T) {
 
 				return refreshToken, payload.ExpiredAt
 			},
-			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
+			func(t *testing.T, res *users.RenewAccessResponse, err error) {
 				st, ok := status.FromError(err)
 				require.True(t, ok)
 				require.Equal(t, codes.Internal, st.Code())
@@ -245,7 +245,7 @@ func TestRenewAccess(t *testing.T) {
 			server := newTestServer(t, store, taskDistributor)
 			refreshToken, _ := tc.buildStubs(store, server)
 
-			req := &pb.RenewAccessRequest{
+			req := &users.RenewAccessRequest{
 				RefreshToken: refreshToken,
 			}
 

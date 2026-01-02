@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "simplebank/pb/transfers";
+
+import "google/protobuf/timestamp.proto";
+
+message Transfer {
+  int64 id = 1;
+
+  google.protobuf.Timestamp date = 2;
+
+  int64 credit = 3;
+
+  int64 debit = 4;
+
+  int64 balance = 5;
+
+  optional string description = 6;
+}

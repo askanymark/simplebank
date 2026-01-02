@@ -4,7 +4,6 @@ import (
 	"context"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
 	"simplebank/token"
 	"simplebank/util"
 	"testing"
@@ -35,14 +34,14 @@ func TestListAccounts(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		req           *pb.ListAccountsRequest
+		req           *accounts.ListAccountsRequest
 		buildStubs    func(store *mockdb.MockStore)
 		buildContext  func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse func(t *testing.T, res *pb.ListAccountsResponse, err error)
+		checkResponse func(t *testing.T, res *accounts.ListAccountsResponse, err error)
 	}{
 		{
 			"OK",
-			&pb.ListAccountsRequest{
+			&accounts.ListAccountsRequest{
 				Limit: 10,
 			},
 			func(store *mockdb.MockStore) {
@@ -60,7 +59,7 @@ func TestListAccounts(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
+			func(t *testing.T, res *accounts.ListAccountsResponse, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Len(t, res.Data, n)
@@ -68,7 +67,7 @@ func TestListAccounts(t *testing.T) {
 		},
 		{
 			"OKBanker",
-			&pb.ListAccountsRequest{
+			&accounts.ListAccountsRequest{
 				Username: &otherUser.Username,
 				Limit:    10,
 			},
@@ -87,7 +86,7 @@ func TestListAccounts(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
+			func(t *testing.T, res *accounts.ListAccountsResponse, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.Len(t, res.Data, n)
@@ -95,7 +94,7 @@ func TestListAccounts(t *testing.T) {
 		},
 		{
 			"PermissionDenied",
-			&pb.ListAccountsRequest{
+			&accounts.ListAccountsRequest{
 				Username: &otherUser.Username,
 			},
 			func(store *mockdb.MockStore) {
@@ -106,7 +105,7 @@ func TestListAccounts(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
+			func(t *testing.T, res *accounts.ListAccountsResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -115,7 +114,7 @@ func TestListAccounts(t *testing.T) {
 		},
 		{
 			"Unauthorized",
-			&pb.ListAccountsRequest{},
+			&accounts.ListAccountsRequest{},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
 					ListAccounts(gomock.Any(), gomock.Any()).
@@ -124,7 +123,7 @@ func TestListAccounts(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
+			func(t *testing.T, res *accounts.ListAccountsResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -133,7 +132,7 @@ func TestListAccounts(t *testing.T) {
 		},
 		{
 			"InternalError",
-			&pb.ListAccountsRequest{},
+			&accounts.ListAccountsRequest{},
 			func(store *mockdb.MockStore) {
 				store.EXPECT().
 					ListAccounts(gomock.Any(), gomock.Any()).
@@ -143,7 +142,7 @@ func TestListAccounts(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
+			func(t *testing.T, res *accounts.ListAccountsResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -152,7 +151,7 @@ func TestListAccounts(t *testing.T) {
 		},
 		{
 			"InvalidUsername",
-			&pb.ListAccountsRequest{
+			&accounts.ListAccountsRequest{
 				Username: func() *string { s := "invalid#user"; return &s }(),
 			},
 			func(store *mockdb.MockStore) {
@@ -163,7 +162,7 @@ func TestListAccounts(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
 			},
-			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
+			func(t *testing.T, res *accounts.ListAccountsResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)

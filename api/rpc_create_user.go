@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
+	"simplebank/pb/users"
 	"simplebank/util"
 	"simplebank/val"
 	"simplebank/worker"
@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
+func (server *Server) CreateUser(ctx context.Context, req *users.CreateUserRequest) (*users.User, error) {
 	violations := validateCreateUserRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
@@ -58,7 +58,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	return txResult.User.ToResponse(), nil
 }
 
-func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateCreateUserRequest(req *users.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}

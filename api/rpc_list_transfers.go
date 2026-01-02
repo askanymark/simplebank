@@ -4,6 +4,7 @@ import (
 	"context"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
+	"simplebank/pb/transfers"
 	"simplebank/util"
 	"simplebank/val"
 
@@ -12,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) ListTransfers(ctx context.Context, req *pb.ListTransfersRequest) (*pb.ListTransfersResponse, error) {
+func (server *Server) ListTransfers(ctx context.Context, req *transfers.ListTransfersRequest) (*transfers.ListTransfersResponse, error) {
 	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
@@ -46,12 +47,12 @@ func (server *Server) ListTransfers(ctx context.Context, req *pb.ListTransfersRe
 	// List transfers from owned accounts
 	transfers := findTransfersForAccounts(ctx, server.store, accounts)
 
-	response := &pb.ListTransfersResponse{
+	response := &transfers.ListTransfersResponse{
 		Pagination: &pb.Pagination{
 			// TODO cursor
 			Count: int64(len(transfers)),
 		},
-		Data: make([]*pb.Transfer, len(transfers)),
+		Data: make([]*transfers.Transfer, len(transfers)),
 	}
 
 	for i, transfer := range transfers {
@@ -61,7 +62,7 @@ func (server *Server) ListTransfers(ctx context.Context, req *pb.ListTransfersRe
 	return response, nil
 }
 
-func validateListTransfersRequest(req *pb.ListTransfersRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateListTransfersRequest(req *transfers.ListTransfersRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if req.Username != nil {
 		if err := val.ValidateUsername(req.GetUsername()); err != nil {
 			violations = append(violations, fieldViolation("username", err))
@@ -82,11 +83,11 @@ func findTransfersForAccounts(ctx context.Context, store db.Store, accounts []db
 			Offset:        0,
 		}
 
-		transfers, err := store.ListTransfers(ctx, arg)
+		listTransfers, err := store.ListTransfers(ctx, arg)
 		if err != nil {
 			continue
 		}
-		results = append(results, transfers...)
+		results = append(results, listTransfers...)
 	}
 
 	return results

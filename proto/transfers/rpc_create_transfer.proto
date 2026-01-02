@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "simplebank/pb/transfers";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "accounts/account.proto";
+import "transfers/transfer.proto";
+import "transfers/entry.proto";
+
+message CreateTransferRequest {
+  int64 from_account_id = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Where to send money from"
+    }
+  ];
+
+  int64 to_account_id = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Where to send money to"
+    }
+  ];
+
+  int64 amount = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The amount of money to transfer in the smallest currency",
+      minimum: 0
+    }
+  ];
+
+  Currency currency = 4 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Type of currency to transfer money in"
+    }
+  ];
+
+  optional string description = 5 [
+    (google.api.field_behavior) = OPTIONAL,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Optional transfer description"
+    }
+  ];
+}
+
+message CreateTransferResponse {
+  Transfer transfer = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Transfer details"
+    }
+  ];
+
+  Account from_account = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sender account state after transfer"
+    }
+  ];
+
+  Account to_account = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Receiver account state after transfer"
+    }
+  ];
+
+  Entry from_entry = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Record made against sender account"
+    }
+  ];
+
+  Entry to_entry = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Record made against receiver account"
+    }
+  ];
+}

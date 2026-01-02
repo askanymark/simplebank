@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "simplebank/pb/users";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/field_behavior.proto";
+
+message CreateUserRequest {
+  string username = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      pattern: "^[a-z0-9_]+$",
+      min_length: 3,
+      max_length: 100
+    }
+  ];
+
+  string full_name = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      pattern: "^[a-zA-Z\\s]+$",
+      min_length: 3,
+      max_length: 100
+    }
+  ];
+
+  string email = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "RFC 5322",
+      min_length: 6,
+      max_length: 100
+    }
+  ];
+
+  string password = 4 [
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 6,
+      max_length: 100
+    }
+  ];
+}
