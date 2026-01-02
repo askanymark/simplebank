@@ -1,8 +1,9 @@
-package api
+package users
 
 import (
 	"context"
 	"errors"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"time"
@@ -12,13 +13,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (server *Server) RenewAccess(ctx context.Context, req *pb.RenewAccessRequest) (*pb.RenewAccessResponse, error) {
-	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
+func (h *UserHandler) RenewAccess(ctx context.Context, req *pb.RenewAccessRequest) (*pb.RenewAccessResponse, error) {
+	refreshPayload, err := h.Server.TokenMaker.VerifyToken(req.RefreshToken)
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, core.UnauthenticatedError(err)
 	}
 
-	session, err := server.store.GetSession(ctx, refreshPayload.ID)
+	session, err := h.Server.Store.GetSession(ctx, refreshPayload.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "session not found")
@@ -43,7 +44,7 @@ func (server *Server) RenewAccess(ctx context.Context, req *pb.RenewAccessReques
 		return nil, status.Errorf(codes.PermissionDenied, "expired session")
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(refreshPayload.Username, refreshPayload.Role, server.config.AccessTokenDuration)
+	accessToken, accessPayload, err := h.Server.TokenMaker.CreateToken(refreshPayload.Username, refreshPayload.Role, h.Server.Config.AccessTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create access token: %v", err)
 	}

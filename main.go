@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"simplebank/api"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	_ "simplebank/docs/statik"
 	"simplebank/mail"
@@ -100,7 +101,7 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, err error, co
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
 
-	grpcLogger := grpc.UnaryInterceptor(api.GrpcLogger)
+	grpcLogger := grpc.UnaryInterceptor(core.GrpcLogger)
 	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterSimplebankServer(grpcServer, server)
 	reflection.Register(grpcServer)
@@ -175,7 +176,7 @@ func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config uti
 		AllowedOrigins: []string{"http://localhost:3000", "https://simplebank.askanymark.io"},
 		AllowedMethods: []string{"GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"},
 	})
-	handler := c.Handler(api.HttpLogger(mux))
+	handler := c.Handler(core.HttpLogger(mux))
 	httpServer := &http.Server{
 		Handler: handler,
 		Addr:    config.HTTPServerAddress,

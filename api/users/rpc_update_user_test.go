@@ -1,7 +1,8 @@
-package api
+package users
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -16,7 +17,7 @@ import (
 )
 
 func TestUpdateUserAPI(t *testing.T) {
-	user, _ := randomUser(t)
+	user, _ := testutil.RandomUser(t)
 
 	newName := util.RandomOwner()
 	newEmail := util.RandomEmail()
@@ -61,7 +62,7 @@ func TestUpdateUserAPI(t *testing.T) {
 					Return(updatedUser, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.User, err error) {
 				require.NoError(t, err)
@@ -80,10 +81,11 @@ func TestUpdateUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(storeCtrl)
 
 			tc.buildStubs(store)
-			server := newTestServer(t, store, nil)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewUserHandler(coreServer)
 
-			ctx := tc.buildContext(t, server.tokenMaker)
-			res, err := server.UpdateUser(ctx, tc.req)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
+			res, err := handler.UpdateUser(ctx, tc.req)
 			tc.checkResponse(t, res, err)
 		})
 	}

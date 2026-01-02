@@ -1,8 +1,9 @@
-package api
+package users
 
 import (
 	"context"
 	"errors"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
@@ -15,15 +16,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
-	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
+func (h *UserHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
+	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, core.UnauthenticatedError(err)
 	}
 
 	violations := validateUpdateUserRequest(req)
 	if violations != nil {
-		return nil, invalidArgumentError(violations)
+		return nil, core.InvalidArgumentError(violations)
 	}
 
 	if !util.IsBanker(authPayload.Role) && authPayload.Username != req.GetUsername() {
@@ -58,7 +59,7 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		}
 	}
 
-	user, err := server.store.UpdateUser(ctx, arg)
+	user, err := h.Server.Store.UpdateUser(ctx, arg)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
@@ -76,24 +77,24 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
-		violations = append(violations, fieldViolation("username", err))
+		violations = append(violations, core.FieldViolation("username", err))
 	}
 
 	if req.Password != nil {
 		if err := val.ValidatePassword(req.GetPassword()); err != nil {
-			violations = append(violations, fieldViolation("password", err))
+			violations = append(violations, core.FieldViolation("password", err))
 		}
 	}
 
 	if req.FullName != nil {
 		if err := val.ValidateFullName(req.GetFullName()); err != nil {
-			violations = append(violations, fieldViolation("full_name", err))
+			violations = append(violations, core.FieldViolation("full_name", err))
 		}
 	}
 
 	if req.Email != nil {
 		if err := val.ValidateEmail(req.GetEmail()); err != nil {
-			violations = append(violations, fieldViolation("email", err))
+			violations = append(violations, core.FieldViolation("email", err))
 		}
 	}
 

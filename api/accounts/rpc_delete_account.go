@@ -1,8 +1,9 @@
-package api
+package accounts
 
 import (
 	"context"
 	"errors"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
@@ -12,13 +13,13 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (server *Server) DeleteAccount(ctx context.Context, req *pb.DeleteAccountRequest) (*emptypb.Empty, error) {
-	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
+func (h *AccountHandler) DeleteAccount(ctx context.Context, req *pb.DeleteAccountRequest) (*emptypb.Empty, error) {
+	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, core.UnauthenticatedError(err)
 	}
 
-	account, err := server.store.GetAccount(ctx, req.GetAccountId())
+	account, err := h.Server.Store.GetAccount(ctx, req.GetAccountId())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account not found")
@@ -32,7 +33,7 @@ func (server *Server) DeleteAccount(ctx context.Context, req *pb.DeleteAccountRe
 		return nil, status.Errorf(codes.PermissionDenied, "cannot delete other user's account")
 	}
 
-	if err = server.store.DeleteAccount(ctx, req.GetAccountId()); err != nil {
+	if err = h.Server.Store.DeleteAccount(ctx, req.GetAccountId()); err != nil {
 		errCode := db.ErrorCode(err)
 
 		if errCode == db.ForeignKeyViolation {

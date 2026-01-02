@@ -1,7 +1,8 @@
-package api
+package accounts
 
 import (
 	"context"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
@@ -12,15 +13,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequest) (*pb.ListAccountsResponse, error) {
-	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
+func (h *AccountHandler) ListAccounts(ctx context.Context, req *pb.ListAccountsRequest) (*pb.ListAccountsResponse, error) {
+	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, core.UnauthenticatedError(err)
 	}
 
 	violations := validateListAccountsRequest(req)
 	if violations != nil {
-		return nil, invalidArgumentError(violations)
+		return nil, core.InvalidArgumentError(violations)
 	}
 
 	// Only bankers can list accounts of other users
@@ -34,7 +35,7 @@ func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequ
 	}
 
 	// Find accounts the user owns
-	accounts, err := server.store.ListAccounts(ctx, db.ListAccountsParams{
+	accounts, err := h.Server.Store.ListAccounts(ctx, db.ListAccountsParams{
 		Owner:  username,
 		Limit:  10,
 		Offset: 0,
@@ -61,7 +62,7 @@ func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequ
 func validateListAccountsRequest(req *pb.ListAccountsRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if req.Username != nil {
 		if err := val.ValidateUsername(req.GetUsername()); err != nil {
-			violations = append(violations, fieldViolation("username", err))
+			violations = append(violations, core.FieldViolation("username", err))
 		}
 	}
 

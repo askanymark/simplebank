@@ -1,7 +1,8 @@
-package api
+package accounts
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -13,8 +14,8 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestServer_CreateAccount(t *testing.T) {
-	user, _ := randomUser(t)
+func TestAccountHandler_CreateAccount(t *testing.T) {
+	user, _ := testutil.RandomUser(t)
 	expectedCurrency := pb.Currency_GBP
 	currencyPtr := expectedCurrency.Enum()
 
@@ -51,7 +52,7 @@ func TestServer_CreateAccount(t *testing.T) {
 					Return(newAccount, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.Account, err error) {
 				require.NoError(t, err)
@@ -71,9 +72,10 @@ func TestServer_CreateAccount(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start the server and send the request
-			server := newTestServer(t, store, nil)
-			ctx := tc.buildContext(t, server.tokenMaker)
-			res, err := server.CreateAccount(ctx, tc.body)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewAccountHandler(coreServer)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
+			res, err := handler.CreateAccount(ctx, tc.body)
 			tc.checkResponse(t, res, err)
 		})
 	}

@@ -1,7 +1,8 @@
-package api
+package transfers
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -17,9 +18,9 @@ import (
 )
 
 func TestCreateTransfer(t *testing.T) {
-	user, _ := randomUser(t)
-	account1 := randomAccount(user.Username)
-	account2 := randomAccount(util.RandomOwner())
+	user, _ := testutil.RandomUser(t)
+	account1 := testutil.RandomAccount(user.Username)
+	account2 := testutil.RandomAccount(util.RandomOwner())
 
 	account1.Currency = util.USD
 	account2.Currency = util.USD
@@ -70,7 +71,7 @@ func TestCreateTransfer(t *testing.T) {
 					}, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.NoError(t, err)
@@ -127,7 +128,7 @@ func TestCreateTransfer(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
@@ -160,7 +161,7 @@ func TestCreateTransfer(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
@@ -192,7 +193,7 @@ func TestCreateTransfer(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
@@ -227,7 +228,7 @@ func TestCreateTransfer(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
@@ -261,7 +262,7 @@ func TestCreateTransfer(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
@@ -295,7 +296,7 @@ func TestCreateTransfer(t *testing.T) {
 					Return(db.TransferTxResult{}, context.DeadlineExceeded)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.CreateTransferResponse, err error) {
 				require.Error(t, err)
@@ -314,10 +315,11 @@ func TestCreateTransfer(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store, nil)
-			ctx := tc.buildContext(t, server.tokenMaker)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewTransferHandler(coreServer)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
 
-			res, err := server.CreateTransfer(ctx, tc.req)
+			res, err := handler.CreateTransfer(ctx, tc.req)
 			tc.checkResponse(t, res, err)
 		})
 	}

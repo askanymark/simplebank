@@ -1,8 +1,10 @@
-package api
+package users
 
 import (
 	"context"
 	"database/sql"
+	"simplebank/api/core"
+	"simplebank/api/testutil"
 	"simplebank/pb"
 	"testing"
 	"time"
@@ -20,20 +22,20 @@ import (
 )
 
 func TestRenewAccess(t *testing.T) {
-	user, _ := randomUser(t)
+	user, _ := testutil.RandomUser(t)
 
 	role := util.DepositorRole
 	duration := time.Minute
 
 	testCases := []struct {
 		name          string
-		buildStubs    func(store *mockdb.MockStore, server *Server) (string, time.Time)
+		buildStubs    func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time)
 		checkResponse func(t *testing.T, res *pb.RenewAccessResponse, err error)
 	}{
 		{
 			"OK",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				session := db.Session{
@@ -63,7 +65,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"Unauthenticated",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
 				return "invalid-token", time.Time{}
 			},
 			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
@@ -74,8 +76,8 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"SessionNotFound",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				store.EXPECT().
@@ -93,8 +95,8 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"SessionBlocked",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				session := db.Session{
@@ -123,8 +125,8 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"UserMismatch",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				session := db.Session{
@@ -153,8 +155,8 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"TokenMismatch",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				session := db.Session{
@@ -183,8 +185,8 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"SessionExpired",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				session := db.Session{
@@ -213,8 +215,8 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"InternalError",
-			func(store *mockdb.MockStore, server *Server) (string, time.Time) {
-				refreshToken, payload, err := server.tokenMaker.CreateToken(user.Username, role, duration)
+			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
 				store.EXPECT().
@@ -242,14 +244,15 @@ func TestRenewAccess(t *testing.T) {
 			defer taskCtrl.Finish()
 			taskDistributor := mockwk.NewMockTaskDistributor(taskCtrl)
 
-			server := newTestServer(t, store, taskDistributor)
-			refreshToken, _ := tc.buildStubs(store, server)
+			coreServer := testutil.NewTestServer(t, store, taskDistributor)
+			handler := NewUserHandler(coreServer)
+			refreshToken, _ := tc.buildStubs(store, coreServer)
 
 			req := &pb.RenewAccessRequest{
 				RefreshToken: refreshToken,
 			}
 
-			res, err := server.RenewAccess(context.Background(), req)
+			res, err := handler.RenewAccess(context.Background(), req)
 			tc.checkResponse(t, res, err)
 		})
 	}

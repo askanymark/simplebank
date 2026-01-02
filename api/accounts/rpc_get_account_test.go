@@ -1,7 +1,8 @@
-package api
+package accounts
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -16,8 +17,8 @@ import (
 )
 
 func TestGetAccount(t *testing.T) {
-	user, _ := randomUser(t)
-	account := randomAccount(user.Username)
+	user, _ := testutil.RandomUser(t)
+	account := testutil.RandomAccount(user.Username)
 
 	testCases := []struct {
 		name          string
@@ -38,7 +39,7 @@ func TestGetAccount(t *testing.T) {
 					Return(account, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.Account, err error) {
 				require.NoError(t, err)
@@ -59,7 +60,7 @@ func TestGetAccount(t *testing.T) {
 					Return(db.Account{}, db.ErrRecordNotFound)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
@@ -80,7 +81,7 @@ func TestGetAccount(t *testing.T) {
 					Return(db.Account{}, context.DeadlineExceeded)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
@@ -95,8 +96,8 @@ func TestGetAccount(t *testing.T) {
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
-				otherUser, _ := randomUser(t)
-				otherAccount := randomAccount(otherUser.Username)
+				otherUser, _ := testutil.RandomUser(t)
+				otherAccount := testutil.RandomAccount(otherUser.Username)
 
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
@@ -104,7 +105,7 @@ func TestGetAccount(t *testing.T) {
 					Return(otherAccount, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.Account, err error) {
 				require.Error(t, err)
@@ -143,9 +144,10 @@ func TestGetAccount(t *testing.T) {
 
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store, nil)
-			ctx := tc.buildContext(t, server.tokenMaker)
-			res, err := server.GetAccount(ctx, tc.req)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewAccountHandler(coreServer)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
+			res, err := handler.GetAccount(ctx, tc.req)
 			tc.checkResponse(t, res, err)
 		})
 	}

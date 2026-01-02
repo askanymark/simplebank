@@ -1,7 +1,8 @@
-package api
+package users
 
 import (
 	"context"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/val"
@@ -11,13 +12,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailRequest) (*pb.VerifyEmailResponse, error) {
+func (h *UserHandler) VerifyEmail(ctx context.Context, req *pb.VerifyEmailRequest) (*pb.VerifyEmailResponse, error) {
 	violations := validateVerifyEmailRequest(req)
 	if violations != nil {
-		return nil, invalidArgumentError(violations)
+		return nil, core.InvalidArgumentError(violations)
 	}
 
-	txResult, err := server.store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
+	txResult, err := h.Server.Store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
 		EmailId:    req.GetEmailId(),
 		SecretCode: req.GetSecretCode(),
 	})
@@ -33,11 +34,11 @@ func (server *Server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 
 func validateVerifyEmailRequest(req *pb.VerifyEmailRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateEmailId(req.GetEmailId()); err != nil {
-		violations = append(violations, fieldViolation("email_id", err))
+		violations = append(violations, core.FieldViolation("email_id", err))
 	}
 
 	if err := val.ValidateSecretCode(req.GetSecretCode()); err != nil {
-		violations = append(violations, fieldViolation("secret_code", err))
+		violations = append(violations, core.FieldViolation("secret_code", err))
 	}
 
 	return violations

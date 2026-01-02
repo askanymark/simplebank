@@ -1,8 +1,9 @@
-package api
+package transfers
 
 import (
 	"context"
 	"errors"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
@@ -11,14 +12,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransferRequest) (*pb.CreateTransferResponse, error) {
-	authPayload, err := server.authorizeUser(ctx, []string{util.DepositorRole, util.BankerRole})
+func (h *TransferHandler) CreateTransfer(ctx context.Context, req *pb.CreateTransferRequest) (*pb.CreateTransferResponse, error) {
+	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, core.UnauthenticatedError(err)
 	}
 
 	// Fetch sender account
-	fromAccount, err := server.validAccount(ctx, req.FromAccountId, req.Currency.String())
+	fromAccount, err := h.validAccount(ctx, req.FromAccountId, req.Currency.String())
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +29,7 @@ func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransfer
 		return nil, status.Errorf(codes.PermissionDenied, "from account does not belong to the authenticated user")
 	}
 
-	_, err = server.validAccount(ctx, req.ToAccountId, req.Currency.String())
+	_, err = h.validAccount(ctx, req.ToAccountId, req.Currency.String())
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +41,7 @@ func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransfer
 		Description:   req.GetDescription(),
 	}
 
-	result, err := server.store.TransferTx(ctx, arg)
+	result, err := h.Server.Store.TransferTx(ctx, arg)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create transfer: %v", err)
@@ -57,8 +58,8 @@ func (server *Server) CreateTransfer(ctx context.Context, req *pb.CreateTransfer
 	return response, nil
 }
 
-func (server *Server) validAccount(ctx context.Context, accountId int64, currency string) (*db.Account, error) {
-	account, err := server.store.GetAccount(ctx, accountId)
+func (h *TransferHandler) validAccount(ctx context.Context, accountId int64, currency string) (*db.Account, error) {
+	account, err := h.Server.Store.GetAccount(ctx, accountId)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account not found")

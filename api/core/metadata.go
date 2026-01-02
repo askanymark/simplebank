@@ -1,4 +1,4 @@
-package api
+package core
 
 import (
 	"context"
@@ -18,8 +18,8 @@ type Metadata struct {
 	ClientIP  string
 }
 
-// extractMetadata retrieves metadata from the provided context, including user-agent and client IP information.
-func (server *Server) extractMetadata(ctx context.Context) *Metadata {
+// ExtractMetadata retrieves metadata from the provided context, including user-agent and client IP information.
+func ExtractMetadata(ctx context.Context) *Metadata {
 	mtdt := &Metadata{}
 
 	if md, ok := metadata.FromIncomingContext(ctx); ok {

@@ -1,7 +1,8 @@
-package api
+package transfers
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -10,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -18,17 +18,17 @@ import (
 )
 
 func TestListTransactions(t *testing.T) {
-	user, _ := randomUser(t)
-	banker, _ := randomUser(t)
+	user, _ := testutil.RandomUser(t)
+	banker, _ := testutil.RandomUser(t)
 	banker.Role = util.BankerRole
 
-	otherUser, _ := randomUser(t)
+	otherUser, _ := testutil.RandomUser(t)
 
-	account1 := randomAccount(user.Username)
-	account2 := randomAccount(user.Username)
+	account1 := testutil.RandomAccount(user.Username)
+	account2 := testutil.RandomAccount(user.Username)
 
-	transfer1 := randomTransfer(account1.ID, account2.ID)
-	transfer2 := randomTransfer(account2.ID, account1.ID)
+	transfer1 := testutil.RandomTransfer(account1.ID, account2.ID)
+	transfer2 := testutil.RandomTransfer(account2.ID, account1.ID)
 
 	testCases := []struct {
 		name          string
@@ -71,7 +71,7 @@ func TestListTransactions(t *testing.T) {
 					Return([]db.Transfer{transfer1, transfer2}, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
 				require.NoError(t, err)
@@ -102,7 +102,7 @@ func TestListTransactions(t *testing.T) {
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
 				// Bankers must also have DepositorRole to pass authorizeUser check if it's required
 				// But wait, ListTransactions only allows DepositorRole in authorizeUser!
-				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, banker.Username, banker.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
 				require.NoError(t, err)
@@ -121,7 +121,7 @@ func TestListTransactions(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
 				require.Error(t, err)
@@ -158,7 +158,7 @@ func TestListTransactions(t *testing.T) {
 					Return([]db.Account{}, context.DeadlineExceeded)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListTransfersResponse, err error) {
 				require.Error(t, err)
@@ -177,33 +177,11 @@ func TestListTransactions(t *testing.T) {
 
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store, nil)
-			ctx := tc.buildContext(t, server.tokenMaker)
-			res, err := server.ListTransfers(ctx, tc.req)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewTransferHandler(coreServer)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
+			res, err := handler.ListTransfers(ctx, tc.req)
 			tc.checkResponse(t, res, err)
 		})
-	}
-}
-
-func randomAccount(owner string) db.Account {
-	return db.Account{
-		ID:       util.RandomInt(1, 1000),
-		Owner:    owner,
-		Balance:  util.RandomMoney(),
-		Currency: util.RandomCurrency(),
-	}
-}
-
-func randomTransfer(fromAccountID, toAccountID int64) db.Transfer {
-	return db.Transfer{
-		ID:            util.RandomInt(1, 1000),
-		FromAccountID: fromAccountID,
-		ToAccountID:   toAccountID,
-		Amount:        util.RandomMoney(),
-		CreatedAt:     time.Now().UTC(),
-		Description: pgtype.Text{
-			String: util.RandomString(18),
-			Valid:  true,
-		},
 	}
 }

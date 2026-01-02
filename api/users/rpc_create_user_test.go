@@ -1,9 +1,10 @@
-package api
+package users
 
 import (
 	"context"
 	"fmt"
 	"reflect"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -11,7 +12,6 @@ import (
 	"simplebank/worker"
 	mockwk "simplebank/worker/mock"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -52,27 +52,8 @@ func EqCreateUserTxParams(arg db.CreateUserTxParams, password string, user db.Us
 	return &eqCreateUserTxParamsMatcher{arg, password, user}
 }
 
-func randomUser(t *testing.T) (user db.User, password string) {
-	password = util.RandomString(6)
-	hashedPassword, err := util.HashPassword(password)
-	require.NoError(t, err)
-	require.NotEmpty(t, hashedPassword)
-
-	user = db.User{
-		Username:          util.RandomOwner(),
-		Role:              util.DepositorRole,
-		HashedPassword:    hashedPassword,
-		FullName:          util.RandomOwner(),
-		Email:             util.RandomEmail(),
-		CreatedAt:         time.Now().UTC(),
-		PasswordChangedAt: time.Date(0001, 01, 01, 0, 0, 0, 0, time.UTC),
-	}
-
-	return
-}
-
 func TestCreateUser(t *testing.T) {
-	user, password := randomUser(t)
+	user, password := testutil.RandomUser(t)
 
 	testCases := []struct {
 		name          string
@@ -133,8 +114,9 @@ func TestCreateUser(t *testing.T) {
 			tc.buildStubs(store, taskDistributor)
 
 			// start the server and send request
-			server := newTestServer(t, store, taskDistributor)
-			res, err := server.CreateUser(context.Background(), tc.body)
+			coreServer := testutil.NewTestServer(t, store, taskDistributor)
+			handler := NewUserHandler(coreServer)
+			res, err := handler.CreateUser(context.Background(), tc.body)
 			tc.checkResponse(t, res, err)
 		})
 	}

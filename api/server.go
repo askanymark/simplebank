@@ -2,19 +2,21 @@ package api
 
 import (
 	"fmt"
+	"simplebank/api/accounts"
+	"simplebank/api/core"
+	"simplebank/api/transfers"
+	"simplebank/api/users"
 	db "simplebank/db/sqlc"
-	"simplebank/pb"
 	"simplebank/token"
 	"simplebank/util"
 	"simplebank/worker"
 )
 
 type Server struct {
-	pb.UnimplementedSimplebankServer
-	config          util.Config
-	store           db.Store
-	tokenMaker      token.Maker
-	taskDistributor worker.TaskDistributor
+	*core.Server
+	*accounts.AccountHandler
+	*users.UserHandler
+	*transfers.TransferHandler
 }
 
 func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
@@ -23,7 +25,19 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
 
-	server := &Server{store: store, tokenMaker: tokenMaker, config: config, taskDistributor: taskDistributor}
+	coreServer := &core.Server{
+		Store:           store,
+		TokenMaker:      tokenMaker,
+		Config:          config,
+		TaskDistributor: taskDistributor,
+	}
+
+	server := &Server{
+		Server:          coreServer,
+		AccountHandler:  accounts.NewAccountHandler(coreServer),
+		UserHandler:     users.NewUserHandler(coreServer),
+		TransferHandler: transfers.NewTransferHandler(coreServer),
+	}
 
 	return server, nil
 }

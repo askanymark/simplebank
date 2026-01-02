@@ -1,7 +1,8 @@
-package api
+package accounts
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -18,10 +19,10 @@ import (
 )
 
 func TestDeleteAccount(t *testing.T) {
-	user, _ := randomUser(t)
-	account := randomAccount(user.Username)
+	user, _ := testutil.RandomUser(t)
+	account := testutil.RandomAccount(user.Username)
 
-	banker, _ := randomUser(t)
+	banker, _ := testutil.RandomUser(t)
 	banker.Role = util.BankerRole
 
 	testCases := []struct {
@@ -47,7 +48,7 @@ func TestDeleteAccount(t *testing.T) {
 					Return(nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.NoError(t, err)
@@ -69,7 +70,7 @@ func TestDeleteAccount(t *testing.T) {
 					Return(nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, banker.Username, banker.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.NoError(t, err)
@@ -90,7 +91,7 @@ func TestDeleteAccount(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.Error(t, err)
@@ -114,7 +115,7 @@ func TestDeleteAccount(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.Error(t, err)
@@ -129,8 +130,8 @@ func TestDeleteAccount(t *testing.T) {
 				AccountId: account.ID,
 			},
 			func(store *mockdb.MockStore) {
-				otherUser, _ := randomUser(t)
-				otherAccount := randomAccount(otherUser.Username)
+				otherUser, _ := testutil.RandomUser(t)
+				otherAccount := testutil.RandomAccount(otherUser.Username)
 
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
@@ -141,7 +142,7 @@ func TestDeleteAccount(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.Error(t, err)
@@ -166,7 +167,7 @@ func TestDeleteAccount(t *testing.T) {
 					Return(context.DeadlineExceeded)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.Error(t, err)
@@ -191,7 +192,7 @@ func TestDeleteAccount(t *testing.T) {
 					Return(&pgconn.PgError{Code: db.ForeignKeyViolation})
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, err error) {
 				require.Error(t, err)
@@ -233,9 +234,10 @@ func TestDeleteAccount(t *testing.T) {
 
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store, nil)
-			ctx := tc.buildContext(t, server.tokenMaker)
-			_, err := server.DeleteAccount(ctx, tc.req)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewAccountHandler(coreServer)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
+			_, err := handler.DeleteAccount(ctx, tc.req)
 			tc.checkResponse(t, err)
 		})
 	}

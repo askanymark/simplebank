@@ -1,7 +1,8 @@
-package api
+package users
 
 import (
 	"context"
+	"simplebank/api/core"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
 	"simplebank/util"
@@ -15,10 +16,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
+func (h *UserHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
 	violations := validateCreateUserRequest(req)
 	if violations != nil {
-		return nil, invalidArgumentError(violations)
+		return nil, core.InvalidArgumentError(violations)
 	}
 
 	hashedPassword, err := util.HashPassword(req.GetPassword())
@@ -42,11 +43,11 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				asynq.ProcessIn(10 * time.Second),
 				asynq.Queue(worker.QueueCritical),
 			}
-			return server.taskDistributor.DistributeSendVerifyEmailTask(ctx, taskPayload, opts...)
+			return h.Server.TaskDistributor.DistributeSendVerifyEmailTask(ctx, taskPayload, opts...)
 		},
 	}
 
-	txResult, err := server.store.CreateUserTx(ctx, arg)
+	txResult, err := h.Server.Store.CreateUserTx(ctx, arg)
 	if err != nil {
 		if db.ErrorCode(err) == db.UniqueViolation {
 			return nil, status.Errorf(codes.AlreadyExists, "this email is unavailable")
@@ -60,19 +61,19 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 
 func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
-		violations = append(violations, fieldViolation("username", err))
+		violations = append(violations, core.FieldViolation("username", err))
 	}
 
 	if err := val.ValidatePassword(req.GetPassword()); err != nil {
-		violations = append(violations, fieldViolation("password", err))
+		violations = append(violations, core.FieldViolation("password", err))
 	}
 
 	if err := val.ValidateFullName(req.GetFullName()); err != nil {
-		violations = append(violations, fieldViolation("full_name", err))
+		violations = append(violations, core.FieldViolation("full_name", err))
 	}
 
 	if err := val.ValidateEmail(req.GetEmail()); err != nil {
-		violations = append(violations, fieldViolation("email", err))
+		violations = append(violations, core.FieldViolation("email", err))
 	}
 
 	return violations

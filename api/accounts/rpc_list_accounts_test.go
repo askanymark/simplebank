@@ -1,7 +1,8 @@
-package api
+package accounts
 
 import (
 	"context"
+	"simplebank/api/testutil"
 	mockdb "simplebank/db/mock"
 	db "simplebank/db/sqlc"
 	"simplebank/pb"
@@ -17,20 +18,20 @@ import (
 )
 
 func TestListAccounts(t *testing.T) {
-	user, _ := randomUser(t)
-	banker, _ := randomUser(t)
+	user, _ := testutil.RandomUser(t)
+	banker, _ := testutil.RandomUser(t)
 	banker.Role = util.BankerRole
-	otherUser, _ := randomUser(t)
+	otherUser, _ := testutil.RandomUser(t)
 
 	n := 5
 	accounts := make([]db.Account, n)
 	for i := 0; i < n; i++ {
-		accounts[i] = randomAccount(user.Username)
+		accounts[i] = testutil.RandomAccount(user.Username)
 	}
 
 	otherAccounts := make([]db.Account, n)
 	for i := 0; i < n; i++ {
-		otherAccounts[i] = randomAccount(otherUser.Username)
+		otherAccounts[i] = testutil.RandomAccount(otherUser.Username)
 	}
 
 	testCases := []struct {
@@ -58,7 +59,7 @@ func TestListAccounts(t *testing.T) {
 					Return(accounts, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.NoError(t, err)
@@ -85,7 +86,7 @@ func TestListAccounts(t *testing.T) {
 					Return(otherAccounts, nil)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, banker.Username, banker.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.NoError(t, err)
@@ -104,7 +105,7 @@ func TestListAccounts(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.Error(t, err)
@@ -141,7 +142,7 @@ func TestListAccounts(t *testing.T) {
 					Return([]db.Account{}, context.DeadlineExceeded)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.Error(t, err)
@@ -161,7 +162,7 @@ func TestListAccounts(t *testing.T) {
 					Times(0)
 			},
 			func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, banker, time.Minute)
+				return testutil.NewContextWithBearerToken(t, tokenMaker, banker.Username, banker.Role, time.Minute)
 			},
 			func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.Error(t, err)
@@ -180,9 +181,10 @@ func TestListAccounts(t *testing.T) {
 
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store, nil)
-			ctx := tc.buildContext(t, server.tokenMaker)
-			res, err := server.ListAccounts(ctx, tc.req)
+			coreServer := testutil.NewTestServer(t, store, nil)
+			handler := NewAccountHandler(coreServer)
+			ctx := tc.buildContext(t, coreServer.TokenMaker)
+			res, err := handler.ListAccounts(ctx, tc.req)
 			tc.checkResponse(t, res, err)
 		})
 	}
