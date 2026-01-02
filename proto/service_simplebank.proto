@@ -38,7 +38,7 @@ service Simplebank {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["User"];
+      tags: ["Users"];
       summary: "Create a new user";
       description: "Use this API to create a new user";
     };
@@ -50,7 +50,7 @@ service Simplebank {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["User"];
+      tags: ["Users"];
       summary: "Update existing user";
       description: "Use this API to update user";
     };
@@ -86,7 +86,7 @@ service Simplebank {
       get: "/v1/users/verify"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["User"];
+      tags: ["Users"];
       summary: "Verify email";
       description: "Use this API to verify email";
     };
@@ -98,20 +98,20 @@ service Simplebank {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["Account"];
+      tags: ["Accounts"];
       summary: "Create account";
       description: "Creates a new account for the logged in user";
     };
   }
 
-  rpc ListTransactions (ListTransfersRequest) returns (ListTransfersResponse) {
+  rpc ListTransfers (ListTransfersRequest) returns (ListTransfersResponse) {
     option (google.api.http) = {
-      get: "/v1/transactions"
+      get: "/v1/transfers"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["Transaction"];
-      summary: "List transactions";
-      description: "Lists transactions for all user owned accounts"
+      tags: ["Transfers"];
+      summary: "List transfers";
+      description: "Lists transfers for all user owned accounts"
     };
   }
 

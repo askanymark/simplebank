@@ -95,7 +95,7 @@
           }
         ],
         "tags": [
-          "Account"
+          "Accounts"
         ]
       }
     },
@@ -200,11 +200,11 @@
         ]
       }
     },
-    "/v1/transactions": {
+    "/v1/transfers": {
       "get": {
-        "summary": "List transactions",
-        "description": "Lists transactions for all user owned accounts",
-        "operationId": "Simplebank_ListTransactions",
+        "summary": "List transfers",
+        "description": "Lists transfers for all user owned accounts",
+        "operationId": "Simplebank_ListTransfers",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -242,11 +242,9 @@
           }
         ],
         "tags": [
-          "Transaction"
+          "Transfers"
         ]
-      }
-    },
-    "/v1/transfers": {
+      },
       "post": {
         "summary": "Create a new transfer",
         "description": "Creates a new money transfer from one account to another",
@@ -310,7 +308,7 @@
           }
         ],
         "tags": [
-          "User"
+          "Users"
         ]
       },
       "put": {
@@ -342,7 +340,7 @@
           }
         ],
         "tags": [
-          "User"
+          "Users"
         ]
       }
     },
@@ -381,7 +379,7 @@
           }
         ],
         "tags": [
-          "User"
+          "Users"
         ]
       }
     }

@@ -187,9 +187,9 @@ func local_request_Simplebank_CreateAccount_0(ctx context.Context, marshaler run
 	return msg, metadata, err
 }
 
-var filter_Simplebank_ListTransactions_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_Simplebank_ListTransfers_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_Simplebank_ListTransactions_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Simplebank_ListTransfers_0(ctx context.Context, marshaler runtime.Marshaler, client SimplebankClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq ListTransfersRequest
 		metadata runtime.ServerMetadata
@@ -197,14 +197,14 @@ func request_Simplebank_ListTransactions_0(ctx context.Context, marshaler runtim
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Simplebank_ListTransactions_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Simplebank_ListTransfers_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := client.ListTransactions(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListTransfers(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_Simplebank_ListTransactions_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Simplebank_ListTransfers_0(ctx context.Context, marshaler runtime.Marshaler, server SimplebankServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq ListTransfersRequest
 		metadata runtime.ServerMetadata
@@ -212,10 +212,10 @@ func local_request_Simplebank_ListTransactions_0(ctx context.Context, marshaler 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Simplebank_ListTransactions_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Simplebank_ListTransfers_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := server.ListTransactions(ctx, &protoReq)
+	msg, err := server.ListTransfers(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -437,25 +437,25 @@ func RegisterSimplebankHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 		}
 		forward_Simplebank_CreateAccount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_Simplebank_ListTransactions_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Simplebank_ListTransfers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Simplebank/ListTransactions", runtime.WithHTTPPathPattern("/v1/transactions"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Simplebank/ListTransfers", runtime.WithHTTPPathPattern("/v1/transfers"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Simplebank_ListTransactions_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Simplebank_ListTransfers_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Simplebank_ListTransactions_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Simplebank_ListTransfers_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodPost, pattern_Simplebank_CreateTransfer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -659,22 +659,22 @@ func RegisterSimplebankHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 		}
 		forward_Simplebank_CreateAccount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_Simplebank_ListTransactions_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_Simplebank_ListTransfers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Simplebank/ListTransactions", runtime.WithHTTPPathPattern("/v1/transactions"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Simplebank/ListTransfers", runtime.WithHTTPPathPattern("/v1/transfers"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Simplebank_ListTransactions_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Simplebank_ListTransfers_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Simplebank_ListTransactions_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Simplebank_ListTransfers_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodPost, pattern_Simplebank_CreateTransfer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -731,27 +731,27 @@ func RegisterSimplebankHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_Simplebank_CreateUser_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "users"}, ""))
-	pattern_Simplebank_UpdateUser_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "users"}, ""))
-	pattern_Simplebank_LoginUser_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "auth", "login"}, ""))
-	pattern_Simplebank_RenewAccess_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "auth", "renew"}, ""))
-	pattern_Simplebank_VerifyEmail_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "users", "verify"}, ""))
-	pattern_Simplebank_CreateAccount_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "accounts"}, ""))
-	pattern_Simplebank_ListTransactions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transactions"}, ""))
-	pattern_Simplebank_CreateTransfer_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transfers"}, ""))
-	pattern_Simplebank_ListAccounts_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "accounts"}, ""))
-	pattern_Simplebank_GetAccount_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "accounts", "account_id"}, ""))
+	pattern_Simplebank_CreateUser_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "users"}, ""))
+	pattern_Simplebank_UpdateUser_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "users"}, ""))
+	pattern_Simplebank_LoginUser_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "auth", "login"}, ""))
+	pattern_Simplebank_RenewAccess_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "auth", "renew"}, ""))
+	pattern_Simplebank_VerifyEmail_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "users", "verify"}, ""))
+	pattern_Simplebank_CreateAccount_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "accounts"}, ""))
+	pattern_Simplebank_ListTransfers_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transfers"}, ""))
+	pattern_Simplebank_CreateTransfer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transfers"}, ""))
+	pattern_Simplebank_ListAccounts_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "accounts"}, ""))
+	pattern_Simplebank_GetAccount_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "accounts", "account_id"}, ""))
 )
 
 var (
-	forward_Simplebank_CreateUser_0       = runtime.ForwardResponseMessage
-	forward_Simplebank_UpdateUser_0       = runtime.ForwardResponseMessage
-	forward_Simplebank_LoginUser_0        = runtime.ForwardResponseMessage
-	forward_Simplebank_RenewAccess_0      = runtime.ForwardResponseMessage
-	forward_Simplebank_VerifyEmail_0      = runtime.ForwardResponseMessage
-	forward_Simplebank_CreateAccount_0    = runtime.ForwardResponseMessage
-	forward_Simplebank_ListTransactions_0 = runtime.ForwardResponseMessage
-	forward_Simplebank_CreateTransfer_0   = runtime.ForwardResponseMessage
-	forward_Simplebank_ListAccounts_0     = runtime.ForwardResponseMessage
-	forward_Simplebank_GetAccount_0       = runtime.ForwardResponseMessage
+	forward_Simplebank_CreateUser_0     = runtime.ForwardResponseMessage
+	forward_Simplebank_UpdateUser_0     = runtime.ForwardResponseMessage
+	forward_Simplebank_LoginUser_0      = runtime.ForwardResponseMessage
+	forward_Simplebank_RenewAccess_0    = runtime.ForwardResponseMessage
+	forward_Simplebank_VerifyEmail_0    = runtime.ForwardResponseMessage
+	forward_Simplebank_CreateAccount_0  = runtime.ForwardResponseMessage
+	forward_Simplebank_ListTransfers_0  = runtime.ForwardResponseMessage
+	forward_Simplebank_CreateTransfer_0 = runtime.ForwardResponseMessage
+	forward_Simplebank_ListAccounts_0   = runtime.ForwardResponseMessage
+	forward_Simplebank_GetAccount_0     = runtime.ForwardResponseMessage
 )

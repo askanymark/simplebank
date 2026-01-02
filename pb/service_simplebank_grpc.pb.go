@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Simplebank_CreateUser_FullMethodName       = "/pb.Simplebank/CreateUser"
-	Simplebank_UpdateUser_FullMethodName       = "/pb.Simplebank/UpdateUser"
-	Simplebank_LoginUser_FullMethodName        = "/pb.Simplebank/LoginUser"
-	Simplebank_RenewAccess_FullMethodName      = "/pb.Simplebank/RenewAccess"
-	Simplebank_VerifyEmail_FullMethodName      = "/pb.Simplebank/VerifyEmail"
-	Simplebank_CreateAccount_FullMethodName    = "/pb.Simplebank/CreateAccount"
-	Simplebank_ListTransactions_FullMethodName = "/pb.Simplebank/ListTransactions"
-	Simplebank_CreateTransfer_FullMethodName   = "/pb.Simplebank/CreateTransfer"
-	Simplebank_ListAccounts_FullMethodName     = "/pb.Simplebank/ListAccounts"
-	Simplebank_GetAccount_FullMethodName       = "/pb.Simplebank/GetAccount"
+	Simplebank_CreateUser_FullMethodName     = "/pb.Simplebank/CreateUser"
+	Simplebank_UpdateUser_FullMethodName     = "/pb.Simplebank/UpdateUser"
+	Simplebank_LoginUser_FullMethodName      = "/pb.Simplebank/LoginUser"
+	Simplebank_RenewAccess_FullMethodName    = "/pb.Simplebank/RenewAccess"
+	Simplebank_VerifyEmail_FullMethodName    = "/pb.Simplebank/VerifyEmail"
+	Simplebank_CreateAccount_FullMethodName  = "/pb.Simplebank/CreateAccount"
+	Simplebank_ListTransfers_FullMethodName  = "/pb.Simplebank/ListTransfers"
+	Simplebank_CreateTransfer_FullMethodName = "/pb.Simplebank/CreateTransfer"
+	Simplebank_ListAccounts_FullMethodName   = "/pb.Simplebank/ListAccounts"
+	Simplebank_GetAccount_FullMethodName     = "/pb.Simplebank/GetAccount"
 )
 
 // SimplebankClient is the client API for Simplebank service.
@@ -41,7 +41,7 @@ type SimplebankClient interface {
 	RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error)
-	ListTransactions(ctx context.Context, in *ListTransfersRequest, opts ...grpc.CallOption) (*ListTransfersResponse, error)
+	ListTransfers(ctx context.Context, in *ListTransfersRequest, opts ...grpc.CallOption) (*ListTransfersResponse, error)
 	CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error)
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error)
@@ -115,10 +115,10 @@ func (c *simplebankClient) CreateAccount(ctx context.Context, in *CreateAccountR
 	return out, nil
 }
 
-func (c *simplebankClient) ListTransactions(ctx context.Context, in *ListTransfersRequest, opts ...grpc.CallOption) (*ListTransfersResponse, error) {
+func (c *simplebankClient) ListTransfers(ctx context.Context, in *ListTransfersRequest, opts ...grpc.CallOption) (*ListTransfersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTransfersResponse)
-	err := c.cc.Invoke(ctx, Simplebank_ListTransactions_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, Simplebank_ListTransfers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ type SimplebankServer interface {
 	RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	CreateAccount(context.Context, *CreateAccountRequest) (*Account, error)
-	ListTransactions(context.Context, *ListTransfersRequest) (*ListTransfersResponse, error)
+	ListTransfers(context.Context, *ListTransfersRequest) (*ListTransfersResponse, error)
 	CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error)
 	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*Account, error)
@@ -197,8 +197,8 @@ func (UnimplementedSimplebankServer) VerifyEmail(context.Context, *VerifyEmailRe
 func (UnimplementedSimplebankServer) CreateAccount(context.Context, *CreateAccountRequest) (*Account, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedSimplebankServer) ListTransactions(context.Context, *ListTransfersRequest) (*ListTransfersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListTransactions not implemented")
+func (UnimplementedSimplebankServer) ListTransfers(context.Context, *ListTransfersRequest) (*ListTransfersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTransfers not implemented")
 }
 func (UnimplementedSimplebankServer) CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTransfer not implemented")
@@ -338,20 +338,20 @@ func _Simplebank_CreateAccount_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Simplebank_ListTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Simplebank_ListTransfers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListTransfersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimplebankServer).ListTransactions(ctx, in)
+		return srv.(SimplebankServer).ListTransfers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Simplebank_ListTransactions_FullMethodName,
+		FullMethod: Simplebank_ListTransfers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimplebankServer).ListTransactions(ctx, req.(*ListTransfersRequest))
+		return srv.(SimplebankServer).ListTransfers(ctx, req.(*ListTransfersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -442,8 +442,8 @@ var Simplebank_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Simplebank_CreateAccount_Handler,
 		},
 		{
-			MethodName: "ListTransactions",
-			Handler:    _Simplebank_ListTransactions_Handler,
+			MethodName: "ListTransfers",
+			Handler:    _Simplebank_ListTransfers_Handler,
 		},
 		{
 			MethodName: "CreateTransfer",
