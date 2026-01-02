@@ -22,6 +22,50 @@
   ],
   "paths": {
     "/v1/accounts": {
+      "get": {
+        "summary": "List accounts",
+        "description": "Lists accounts for user",
+        "operationId": "Simplebank_ListAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbListAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "description": "Bankers can specify username to list accounts for",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Accounts"
+        ]
+      },
       "post": {
         "summary": "Create account",
         "description": "Creates a new account for the logged in user",
@@ -470,6 +514,21 @@
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "pbListAccountsResponse": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/definitions/pbPagination"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbAccount"
+          }
         }
       }
     },

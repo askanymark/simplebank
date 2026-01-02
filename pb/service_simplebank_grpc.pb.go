@@ -27,6 +27,7 @@ const (
 	Simplebank_CreateAccount_FullMethodName    = "/pb.Simplebank/CreateAccount"
 	Simplebank_ListTransactions_FullMethodName = "/pb.Simplebank/ListTransactions"
 	Simplebank_CreateTransfer_FullMethodName   = "/pb.Simplebank/CreateTransfer"
+	Simplebank_ListAccounts_FullMethodName     = "/pb.Simplebank/ListAccounts"
 )
 
 // SimplebankClient is the client API for Simplebank service.
@@ -41,6 +42,7 @@ type SimplebankClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error)
 	ListTransactions(ctx context.Context, in *ListTransfersRequest, opts ...grpc.CallOption) (*ListTransfersResponse, error)
 	CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error)
+	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
 }
 
 type simplebankClient struct {
@@ -131,6 +133,16 @@ func (c *simplebankClient) CreateTransfer(ctx context.Context, in *CreateTransfe
 	return out, nil
 }
 
+func (c *simplebankClient) ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAccountsResponse)
+	err := c.cc.Invoke(ctx, Simplebank_ListAccounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SimplebankServer is the server API for Simplebank service.
 // All implementations must embed UnimplementedSimplebankServer
 // for forward compatibility.
@@ -143,6 +155,7 @@ type SimplebankServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*Account, error)
 	ListTransactions(context.Context, *ListTransfersRequest) (*ListTransfersResponse, error)
 	CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error)
+	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
 	mustEmbedUnimplementedSimplebankServer()
 }
 
@@ -176,6 +189,9 @@ func (UnimplementedSimplebankServer) ListTransactions(context.Context, *ListTran
 }
 func (UnimplementedSimplebankServer) CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTransfer not implemented")
+}
+func (UnimplementedSimplebankServer) ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
 }
 func (UnimplementedSimplebankServer) mustEmbedUnimplementedSimplebankServer() {}
 func (UnimplementedSimplebankServer) testEmbeddedByValue()                    {}
@@ -342,6 +358,24 @@ func _Simplebank_CreateTransfer_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Simplebank_ListAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimplebankServer).ListAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Simplebank_ListAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimplebankServer).ListAccounts(ctx, req.(*ListAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Simplebank_ServiceDesc is the grpc.ServiceDesc for Simplebank service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -380,6 +414,10 @@ var Simplebank_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTransfer",
 			Handler:    _Simplebank_CreateTransfer_Handler,
+		},
+		{
+			MethodName: "ListAccounts",
+			Handler:    _Simplebank_ListAccounts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
