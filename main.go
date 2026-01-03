@@ -30,6 +30,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -103,7 +105,12 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, err error, co
 
 	grpcLogger := grpc.UnaryInterceptor(core.GrpcLogger)
 	grpcServer := grpc.NewServer(grpcLogger)
+
 	pb.RegisterSimplebankServer(grpcServer, server)
+
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
+
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
@@ -162,6 +169,11 @@ func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config uti
 
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
+
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
 
 	statikFs, err := fs.New()
 	if err != nil {
