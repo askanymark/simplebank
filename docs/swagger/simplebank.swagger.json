@@ -64,6 +64,11 @@
         ],
         "tags": [
           "Accounts"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       },
       "post": {
@@ -96,6 +101,11 @@
         ],
         "tags": [
           "Accounts"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -129,6 +139,11 @@
         ],
         "tags": [
           "Accounts"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       },
       "delete": {
@@ -161,6 +176,11 @@
         ],
         "tags": [
           "Accounts"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -229,6 +249,11 @@
         ],
         "tags": [
           "Auth"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -275,6 +300,11 @@
         ],
         "tags": [
           "Transfers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       },
       "post": {
@@ -307,6 +337,11 @@
         ],
         "tags": [
           "Transfers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -373,6 +408,11 @@
         ],
         "tags": [
           "Users"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -803,5 +843,18 @@
         }
       }
     }
-  }
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "description": "Input your Bearer token in this format: Bearer \u003cyour-token\u003e",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
 }

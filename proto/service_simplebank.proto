@@ -21,7 +21,7 @@ import "google/protobuf/empty.proto";
 
 option go_package = "simplebank/pb";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+option (grpc.gateway.protoc_gen_openapiv2.options.openapi v2_swagger) = {
   info: {
     title: "Simplebank API";
     version: "1.0";
@@ -31,6 +31,23 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       email: "marks@askanymark.io";
     };
   };
+  security_definitions: {
+    security: {
+      key: "BearerAuth";
+      value: {
+        type: TYPE_API_KEY;
+        in: IN_HEADER;
+        name: "Authorization";
+        description: "Input your Bearer token in this format: Bearer <your-token>";
+      }
+    }
+  };
+  security: {
+    security_requirement: {
+      key: "BearerAuth";
+      value: {}
+    }
+  }
 };
 
 service Simplebank {
@@ -55,6 +72,12 @@ service Simplebank {
       tags: ["Users"];
       summary: "Update existing user";
       description: "Use this API to update user";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -79,7 +102,13 @@ service Simplebank {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Auth"];
       summary: "Renew access";
-      description: "Extend current login session"
+      description: "Extend current login session";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -103,6 +132,12 @@ service Simplebank {
       tags: ["Accounts"];
       summary: "Create account";
       description: "Creates a new account for the logged in user";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -113,7 +148,13 @@ service Simplebank {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Transfers"];
       summary: "List transfers";
-      description: "Lists transfers for all user owned accounts"
+      description: "Lists transfers for all user owned accounts";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -126,7 +167,13 @@ service Simplebank {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Transfers"],
       summary: "Create a new transfer",
-      description: "Creates a new money transfer from one account to another"
+      description: "Creates a new money transfer from one account to another";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -138,7 +185,13 @@ service Simplebank {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Accounts"]
       summary: "List accounts"
-      description: "Lists accounts for user"
+      description: "Lists accounts for user";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -150,7 +203,13 @@ service Simplebank {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Accounts"]
       summary: "Get account"
-      description: "Returns a user account"
+      description: "Returns a user account";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 
@@ -162,7 +221,13 @@ service Simplebank {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["Accounts"]
       summary: "Delete account"
-      description: "Deletes a user account"
+      description: "Deletes a user account";
+      security: {
+        security_requirement: {
+          key: "BearerAuth";
+          value: {}
+        }
+      }
     };
   }
 }
