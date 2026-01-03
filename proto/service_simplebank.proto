@@ -21,7 +21,7 @@ import "google/protobuf/empty.proto";
 
 option go_package = "simplebank/pb";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapi v2_swagger) = {
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Simplebank API";
     version: "1.0";
