@@ -5,11 +5,11 @@ import (
 )
 
 type UserHandler struct {
-	Server *core.Server
+	core *core.Core
 }
 
-func NewUserHandler(server *core.Server) *UserHandler {
+func NewUserHandler(core *core.Core) *UserHandler {
 	return &UserHandler{
-		Server: server,
+		core: core,
 	}
 }

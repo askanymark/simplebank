@@ -13,7 +13,7 @@ import (
 )
 
 func (h *TransferHandler) CreateTransfer(ctx context.Context, req *pb.CreateTransferRequest) (*pb.CreateTransferResponse, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
@@ -41,7 +41,7 @@ func (h *TransferHandler) CreateTransfer(ctx context.Context, req *pb.CreateTran
 		Description:   req.GetDescription(),
 	}
 
-	result, err := h.Server.Store.TransferTx(ctx, arg)
+	result, err := h.core.Store.TransferTx(ctx, arg)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create transfer: %v", err)
@@ -59,7 +59,7 @@ func (h *TransferHandler) CreateTransfer(ctx context.Context, req *pb.CreateTran
 }
 
 func (h *TransferHandler) validAccount(ctx context.Context, accountId int64, currency string) (*db.Account, error) {
-	account, err := h.Server.Store.GetAccount(ctx, accountId)
+	account, err := h.core.Store.GetAccount(ctx, accountId)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account not found")

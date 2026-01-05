@@ -13,12 +13,12 @@ import (
 )
 
 func (h *AccountHandler) GetAccount(ctx context.Context, req *pb.GetAccountRequest) (*pb.Account, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
 
-	account, err := h.Server.Store.GetAccount(ctx, req.GetAccountId())
+	account, err := h.core.Store.GetAccount(ctx, req.GetAccountId())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account not found")

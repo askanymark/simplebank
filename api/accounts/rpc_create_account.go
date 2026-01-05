@@ -14,7 +14,7 @@ import (
 )
 
 func (h *AccountHandler) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.Account, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
@@ -30,7 +30,7 @@ func (h *AccountHandler) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 		Balance:  0,
 	}
 
-	account, err := h.Server.Store.CreateAccount(ctx, arg)
+	account, err := h.core.Store.CreateAccount(ctx, arg)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create account")
 	}

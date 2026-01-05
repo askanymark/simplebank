@@ -5,11 +5,11 @@ import (
 )
 
 type AccountHandler struct {
-	Server *core.Server
+	core *core.Core
 }
 
-func NewAccountHandler(server *core.Server) *AccountHandler {
+func NewAccountHandler(core *core.Core) *AccountHandler {
 	return &AccountHandler{
-		Server: server,
+		core: core,
 	}
 }

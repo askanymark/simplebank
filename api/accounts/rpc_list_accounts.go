@@ -14,7 +14,7 @@ import (
 )
 
 func (h *AccountHandler) ListAccounts(ctx context.Context, req *pb.ListAccountsRequest) (*pb.ListAccountsResponse, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
@@ -35,7 +35,7 @@ func (h *AccountHandler) ListAccounts(ctx context.Context, req *pb.ListAccountsR
 	}
 
 	// Find accounts the user owns
-	accounts, err := h.Server.Store.ListAccounts(ctx, db.ListAccountsParams{
+	accounts, err := h.core.Store.ListAccounts(ctx, db.ListAccountsParams{
 		Owner:  username,
 		Limit:  10,
 		Offset: 0,

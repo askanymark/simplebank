@@ -15,7 +15,7 @@ import (
 	"simplebank/worker"
 )
 
-func NewTestServer(t *testing.T, store db.Store, distributor worker.TaskDistributor) *core.Server {
+func NewTestServer(t *testing.T, store db.Store, distributor worker.TaskDistributor) *core.Core {
 	config := util.Config{
 		TokenSymmetricKey:   util.RandomString(32),
 		AccessTokenDuration: time.Minute,
@@ -24,7 +24,7 @@ func NewTestServer(t *testing.T, store db.Store, distributor worker.TaskDistribu
 	tokenMaker, err := token.NewPasetoMaker([]byte(config.TokenSymmetricKey))
 	require.NoError(t, err)
 
-	return &core.Server{
+	return &core.Core{
 		Config:          config,
 		Store:           store,
 		TokenMaker:      tokenMaker,

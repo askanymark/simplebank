@@ -14,12 +14,12 @@ import (
 )
 
 func (h *AccountHandler) DeleteAccount(ctx context.Context, req *pb.DeleteAccountRequest) (*emptypb.Empty, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
 
-	account, err := h.Server.Store.GetAccount(ctx, req.GetAccountId())
+	account, err := h.core.Store.GetAccount(ctx, req.GetAccountId())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account not found")
@@ -33,7 +33,7 @@ func (h *AccountHandler) DeleteAccount(ctx context.Context, req *pb.DeleteAccoun
 		return nil, status.Errorf(codes.PermissionDenied, "cannot delete other user's account")
 	}
 
-	if err = h.Server.Store.DeleteAccount(ctx, req.GetAccountId()); err != nil {
+	if err = h.core.Store.DeleteAccount(ctx, req.GetAccountId()); err != nil {
 		errCode := db.ErrorCode(err)
 
 		if errCode == db.ForeignKeyViolation {

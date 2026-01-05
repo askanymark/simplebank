@@ -18,7 +18,7 @@ func (h *UserHandler) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 		return nil, core.InvalidArgumentError(violations)
 	}
 
-	txResult, err := h.Server.Store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
+	txResult, err := h.core.Store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
 		EmailId:    req.GetEmailId(),
 		SecretCode: req.GetSecretCode(),
 	})

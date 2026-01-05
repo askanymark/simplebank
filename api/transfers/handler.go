@@ -5,11 +5,11 @@ import (
 )
 
 type TransferHandler struct {
-	Server *core.Server
+	core *core.Core
 }
 
-func NewTransferHandler(server *core.Server) *TransferHandler {
+func NewTransferHandler(core *core.Core) *TransferHandler {
 	return &TransferHandler{
-		Server: server,
+		core: core,
 	}
 }

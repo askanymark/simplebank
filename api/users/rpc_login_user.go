@@ -22,7 +22,7 @@ func (h *UserHandler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, core.InvalidArgumentError(violations)
 	}
 
-	user, err := h.Server.Store.GetUser(ctx, req.GetUsername())
+	user, err := h.core.Store.GetUser(ctx, req.GetUsername())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "cannot find user: %v", err)
@@ -36,18 +36,18 @@ func (h *UserHandler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	accessToken, accessPayload, err := h.Server.TokenMaker.CreateToken(user.Username, user.Role, h.Server.Config.AccessTokenDuration)
+	accessToken, accessPayload, err := h.core.TokenMaker.CreateToken(user.Username, user.Role, h.core.Config.AccessTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create access token: %v", err)
 	}
 
-	refreshToken, refreshPayload, err := h.Server.TokenMaker.CreateToken(user.Username, user.Role, h.Server.Config.RefreshTokenDuration)
+	refreshToken, refreshPayload, err := h.core.TokenMaker.CreateToken(user.Username, user.Role, h.core.Config.RefreshTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create refresh token: %v", err)
 	}
 
 	metadata := core.ExtractMetadata(ctx)
-	session, err := h.Server.Store.CreateSession(ctx, db.CreateSessionParams{
+	session, err := h.core.Store.CreateSession(ctx, db.CreateSessionParams{
 		ID:           refreshPayload.ID,
 		Username:     user.Username,
 		RefreshToken: refreshToken,

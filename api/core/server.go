@@ -8,7 +8,7 @@ import (
 	"simplebank/worker"
 )
 
-type Server struct {
+type Core struct {
 	pb.UnimplementedSimplebankServer
 	Config          util.Config
 	Store           db.Store

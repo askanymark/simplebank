@@ -43,11 +43,11 @@ func (h *UserHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				asynq.ProcessIn(10 * time.Second),
 				asynq.Queue(worker.QueueCritical),
 			}
-			return h.Server.TaskDistributor.DistributeSendVerifyEmailTask(ctx, taskPayload, opts...)
+			return h.core.TaskDistributor.DistributeSendVerifyEmailTask(ctx, taskPayload, opts...)
 		},
 	}
 
-	txResult, err := h.Server.Store.CreateUserTx(ctx, arg)
+	txResult, err := h.core.Store.CreateUserTx(ctx, arg)
 	if err != nil {
 		if db.ErrorCode(err) == db.UniqueViolation {
 			return nil, status.Errorf(codes.AlreadyExists, "this email is unavailable")

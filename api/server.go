@@ -13,7 +13,7 @@ import (
 )
 
 type Server struct {
-	*core.Server
+	*core.Core
 	*accounts.AccountHandler
 	*users.UserHandler
 	*transfers.TransferHandler
@@ -25,7 +25,7 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
 
-	coreServer := &core.Server{
+	apiCore := &core.Core{
 		Store:           store,
 		TokenMaker:      tokenMaker,
 		Config:          config,
@@ -33,10 +33,10 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 	}
 
 	server := &Server{
-		Server:          coreServer,
-		AccountHandler:  accounts.NewAccountHandler(coreServer),
-		UserHandler:     users.NewUserHandler(coreServer),
-		TransferHandler: transfers.NewTransferHandler(coreServer),
+		Core:            apiCore,
+		AccountHandler:  accounts.NewAccountHandler(apiCore),
+		UserHandler:     users.NewUserHandler(apiCore),
+		TransferHandler: transfers.NewTransferHandler(apiCore),
 	}
 
 	return server, nil

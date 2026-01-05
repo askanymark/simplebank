@@ -29,12 +29,12 @@ func TestRenewAccess(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		buildStubs    func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time)
+		buildStubs    func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time)
 		checkResponse func(t *testing.T, res *pb.RenewAccessResponse, err error)
 	}{
 		{
 			"OK",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
@@ -65,7 +65,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"Unauthenticated",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				return "invalid-token", time.Time{}
 			},
 			func(t *testing.T, res *pb.RenewAccessResponse, err error) {
@@ -76,7 +76,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"SessionNotFound",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
@@ -95,7 +95,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"SessionBlocked",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
@@ -125,7 +125,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"UserMismatch",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
@@ -155,7 +155,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"TokenMismatch",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
@@ -185,7 +185,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"SessionExpired",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 
@@ -215,7 +215,7 @@ func TestRenewAccess(t *testing.T) {
 		},
 		{
 			"InternalError",
-			func(store *mockdb.MockStore, coreServer *core.Server) (string, time.Time) {
+			func(store *mockdb.MockStore, coreServer *core.Core) (string, time.Time) {
 				refreshToken, payload, err := coreServer.TokenMaker.CreateToken(user.Username, role, duration)
 				require.NoError(t, err)
 

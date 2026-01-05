@@ -14,12 +14,12 @@ import (
 )
 
 func (h *UserHandler) RenewAccess(ctx context.Context, req *pb.RenewAccessRequest) (*pb.RenewAccessResponse, error) {
-	refreshPayload, err := h.Server.TokenMaker.VerifyToken(req.RefreshToken)
+	refreshPayload, err := h.core.TokenMaker.VerifyToken(req.RefreshToken)
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
 
-	session, err := h.Server.Store.GetSession(ctx, refreshPayload.ID)
+	session, err := h.core.Store.GetSession(ctx, refreshPayload.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "session not found")
@@ -44,7 +44,7 @@ func (h *UserHandler) RenewAccess(ctx context.Context, req *pb.RenewAccessReques
 		return nil, status.Errorf(codes.PermissionDenied, "expired session")
 	}
 
-	accessToken, accessPayload, err := h.Server.TokenMaker.CreateToken(refreshPayload.Username, refreshPayload.Role, h.Server.Config.AccessTokenDuration)
+	accessToken, accessPayload, err := h.core.TokenMaker.CreateToken(refreshPayload.Username, refreshPayload.Role, h.core.Config.AccessTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create access token: %v", err)
 	}

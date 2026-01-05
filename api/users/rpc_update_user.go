@@ -17,7 +17,7 @@ import (
 )
 
 func (h *UserHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
@@ -59,7 +59,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		}
 	}
 
-	user, err := h.Server.Store.UpdateUser(ctx, arg)
+	user, err := h.core.Store.UpdateUser(ctx, arg)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")

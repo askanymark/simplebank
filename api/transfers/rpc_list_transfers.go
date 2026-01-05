@@ -14,7 +14,7 @@ import (
 )
 
 func (h *TransferHandler) ListTransfers(ctx context.Context, req *pb.ListTransfersRequest) (*pb.ListTransfersResponse, error) {
-	authPayload, err := core.AuthorizeUser(h.Server.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
+	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole, util.BankerRole})
 	if err != nil {
 		return nil, core.UnauthenticatedError(err)
 	}
@@ -35,7 +35,7 @@ func (h *TransferHandler) ListTransfers(ctx context.Context, req *pb.ListTransfe
 	}
 
 	// Find accounts the user owns
-	accounts, err := h.Server.Store.ListAccounts(ctx, db.ListAccountsParams{
+	accounts, err := h.core.Store.ListAccounts(ctx, db.ListAccountsParams{
 		Owner:  username,
 		Limit:  10,
 		Offset: 0,
@@ -45,7 +45,7 @@ func (h *TransferHandler) ListTransfers(ctx context.Context, req *pb.ListTransfe
 	}
 
 	// List transfers from owned accounts
-	transfers := findTransfersForAccounts(ctx, h.Server.Store, accounts)
+	transfers := findTransfersForAccounts(ctx, h.core.Store, accounts)
 
 	response := &pb.ListTransfersResponse{
 		Pagination: &pb.Pagination{
