@@ -8,14 +8,24 @@ import (
 	"simplebank/util"
 	"simplebank/val"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func (h *AccountHandler) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.Account, error) {
+	ctx, span := otel.Tracer("accounts").Start(ctx, "CreateAccount")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.String("account.currency", req.GetCurrency().String()),
+	)
+
 	authPayload, err := core.AuthorizeUser(h.core.TokenMaker, ctx, []string{util.DepositorRole})
 	if err != nil {
+		span.RecordError(err)
 		return nil, core.UnauthenticatedError(err)
 	}
 
@@ -32,9 +42,11 @@ func (h *AccountHandler) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 
 	account, err := h.core.Store.CreateAccount(ctx, arg)
 	if err != nil {
+		span.RecordError(err)
 		return nil, status.Errorf(codes.Internal, "failed to create account")
 	}
 
+	span.SetAttributes(attribute.Int64("account.id", account.ID))
 	return account.ToResponse(), nil
 }
 

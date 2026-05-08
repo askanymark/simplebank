@@ -23,6 +23,7 @@ type Config struct {
 	EmailSenderAddress   string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
 	CertificatePath      string        `mapstructure:"CERTIFICATE_PATH"`
 	KeyPath              string        `mapstructure:"KEY_PATH"`
+	OtelExporterEndpoint string        `mapstructure:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 }
 
 // LoadConfig loads application configuration from the specified path using the Viper library and environment variables.

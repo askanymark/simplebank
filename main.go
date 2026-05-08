@@ -12,11 +12,13 @@ import (
 	db "simplebank/db/sqlc"
 	_ "simplebank/docs/statik"
 	"simplebank/mail"
+	"simplebank/otel"
 	"simplebank/pb"
 	"simplebank/util"
 	"simplebank/worker"
 	"syscall"
 
+	"github.com/exaring/otelpgx"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -28,6 +30,8 @@ import (
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -51,7 +55,23 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), interruptSignals...)
 	defer stop()
 
-	conn, err := pgxpool.New(ctx, config.DBUri)
+	// Set up OpenTelemetry.
+	otelShutdown, err := otel.SetupOTelSDK(ctx, "simplebank", "1.0.0", config.OtelExporterEndpoint)
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot set up OpenTelemetry")
+	}
+	// Handle shutdown properly so nothing leaks.
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
+
+	connConfig, err := pgxpool.ParseConfig(config.DBUri)
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot parse db uri")
+	}
+	connConfig.ConnConfig.Tracer = otelpgx.NewTracer()
+
+	conn, err := pgxpool.NewWithConfig(ctx, connConfig)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to database")
 	}
@@ -103,8 +123,10 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, err error, co
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
 
-	grpcLogger := grpc.UnaryInterceptor(core.GrpcLogger)
-	grpcServer := grpc.NewServer(grpcLogger)
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(core.GrpcLogger),
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	)
 
 	pb.RegisterSimplebankServer(grpcServer, server)
 
@@ -188,7 +210,7 @@ func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config uti
 		AllowedOrigins: []string{"http://localhost:3000", "https://simplebank.askanymark.io"},
 		AllowedMethods: []string{"GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"},
 	})
-	handler := c.Handler(core.HttpLogger(mux))
+	handler := otelhttp.NewHandler(c.Handler(core.HttpLogger(mux)), "gateway")
 	httpServer := &http.Server{
 		Handler: handler,
 		Addr:    config.HTTPServerAddress,
